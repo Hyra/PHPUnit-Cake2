@@ -7,7 +7,6 @@ class PhpunitShell extends AppShell {
 
 	public function main() {
 		$this->out('Hai There. To install PHPUnit, run `phpunit install`');
-		$parser->epilog(array('line one', 'line two'));
 	}
 
 	private function getDependencies() {
@@ -87,36 +86,52 @@ class PhpunitShell extends AppShell {
 		
 		// Create the _TMP folder to put the files
 		$folder = new Folder('./vendors/_TMP');
-		$folder->create('./vendors/_TMP');
-		
-		// Write the necessary folders
 		$folder->create('./vendors/_TMP/_target');
 		
 		// Download all files to a temporary location
 		$files = $this->getDependencies();
 		
+		$folder = new Folder('./vendors/_TMP');
+		
 		foreach($files as $file) {
 			// Download the file
-			$this->out('Downloading ' . $file['name'] . ' .. ');
+			$this->out('Downloading <info>' . $file['name'] . '</info> .. ', 0);
 			$data = $http->get($file['url']);
 			
 			// Write it to the tmp folder
-			$new_file = new File($folder->pwd() . DS . $file['file']);
+			$new_file = new File($folder->path . DS . $file['file']);
 			$new_file->write($data);
-			$this->out('Download succeeded!');
+			$this->out('done.');
 			
 			// Extract the file to the folders
+			$this->out('Extracting .. ', 0);
 			exec('cd '.$folder->path.' && tar -xzf '.$folder->path.'/'.$file['file']);
+			$this->out('done.');
 			
 			// Copy the contents to the target folder
+			$this->out('Adding to Vendors .. ', 0);
 			exec('cp -R '.$folder->path.'/'.(str_replace('.tgz', '', $file['file'])).'/'.$file['vendor_folder']. ' ' .$folder->path.'/_target');
+			$this->out('done.');
+			
+			$this->hr();
 		}
 		
+		$this->out('Cleaning up install files.');
+		
+		$this->hr();
+		
 		// Copy all the result files to vendors
-		exec('cp -R '.APP.'../vendors/_TMP/_target/* '.APP.'../vendors/');
+		$folder->cd('./vendors/_TMP/');
+		exec('cp -R '.$folder->path.'/_target/* '.$folder->path.'/../../vendors/');
 		
 		// Clean up
 		$folder->delete('./vendors/_TMP');
+
+		$this->out();
+		$this->out('<info>PHPUnit 3.5.15</info> <warning>has been succesfully installed to your Vendors folder!</warning>');
+		$this->out();
+		
+		$this->hr();
 	}
 
 }
