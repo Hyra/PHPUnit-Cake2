@@ -3,11 +3,139 @@ App::uses('Folder', 'Utility');
 App::uses('File', 'Utility');
 App::uses('HttpSocket', 'Network/Http');
 
+if (!defined('WINDOWS')) {
+	if (substr(PHP_OS, 0, 3) == 'WIN') {
+		define('WINDOWS', true);
+	} else {
+		define('WINDOWS', false);
+	}
+}
+
+/**
+ * Install PHPUnit for the CakePHP 2.x Test-Framework
+ * Phpunit Plugin
+ * Place it in your app/Plugin/ dir and open a shell inside your app folder
+ * 
+ * - supports windows, linux, mac
+ * - select vendor path dynamically
+ * 
+ * @original Stef van den Ham
+ * @modified Mark Scherer (Windows Comp.)
+ * @license MIT License (http://www.opensource.org/licenses/mit-license.php)
+ * @cakephp 2.0
+ */
 class PhpunitShell extends AppShell {
 
+	const PHPUNIT_VERSION = '3.5.15';
+
 	public function main() {
-		$this->out('Hai There. To install PHPUnit, run `phpunit install`');
+		$this->out(__('Hai There. To install PHPUnit %s, run `Phpunit.Phpunit install`'), self::PHPUNIT_VERSION);
 	}
+
+
+	public function install() {
+		$this->out(__('Installing PHPUnit ..'));
+		
+		$Http = new HttpSocket();
+		
+		$path = $this->_getPath();
+		$tmpPath = $path . '_TMP' . DS;
+		
+		// Create the _TMP folder to put the files
+		$Folder = new Folder($tmpPath, true);
+		$Folder->create($tmpPath . '_target');
+		
+		// Download all files to a temporary location
+		$files = $this->_getDependencies();
+		
+		foreach($files as $file) {
+			if (!file_exists($tmpPath . $file['file']) || !empty($this->params['override'])) {
+				// Download the file
+				$this->out(__('Downloading <info>%s</info> .. ', $file['name']), 0);
+				$data = $Http->get($file['url']);
+				
+				// Write it to the tmp folder
+				$NewFile = new File($tmpPath . $file['file'], true);
+				if (!$NewFile->write($data)) {
+					$this->error(__('Writing failed'), __('Cannot create tmp files. Aborting.'));
+				}
+				$this->out(__('done.'));
+			}
+			
+			// Extract the file to the folders
+			$this->out(__('Extracting ..'), 0);
+			$this->_extract($tmpPath . $file['file']);
+			$this->out('done.');
+			
+			// Copy the contents to the target folder
+			$this->out(__('Adding to Vendors ..'), 0);
+			$Folder->move(array('to'=>$tmpPath . '_target', 'from'=>$tmpPath.(str_replace('.tgz', '', $file['file'])).DS.$file['vendor_folder']));
+			$this->out('done.');
+			
+			$this->hr();
+		}
+		
+		$this->out(__('Cleaning up install files.'));
+		
+		$this->hr();
+		
+		$Folder->move(array('to'=>$path, 'from'=>$tmpPath.'_target'));
+			
+		// Clean up
+		$Folder->delete($path . DS . '_TMP');
+
+		$this->out();
+		$this->out(__('<info>PHPUnit %s</info> <warning>has been successfully installed to your Vendor folder!</warning>'), self::PHPUNIT_VERSION);
+		$this->out();
+		
+		$this->hr();
+	}
+
+	public function clear() {
+		$path = $this->_getPath();
+		$Folder = new Folder($path . '_TMP');
+		$Folder->delete();
+		$this->out('Tmp content deleted');
+	}
+
+	
+	protected function _extract($file) {
+		chdir(dirname($file));
+	
+		if (WINDOWS && empty($this->params['os']) || !empty($this->params['os']) && $this->params['os'] == 'w') {
+			$exePath = App::pluginPath('Phpunit').'Vendor'.DS.'exe'.DS;
+			//die($exePath);
+			exec($exePath.'gzip -dr '.$file);
+			//unlink($file);
+			$file = str_replace('.tgz', '.tar', $file);
+			exec($exePath.'tar -xvf '.$file);
+		} else {
+			exec('tar -xzf '.$file);
+		}
+	}
+	
+	
+	protected function _getPath() {
+		$paths = App::path('Vendor');
+		$pathNames = $paths;
+		
+		$list = array(); 
+		$i = 0;
+		foreach ($paths as $path) {
+			$i++;
+			$list[$i] = $i . ". " . str_replace(ROOT, '', $path);
+		}
+		$this->out($list);
+
+		$res = $this->in('Select VENDOR path to install into', am(array('q'), array_keys($list)), 'q');
+		if ($res == 'q') {
+			return $this->_stop();
+		}
+		
+		$path = $paths[$res-1];
+		return $path;
+	}
+
 
 	protected function _getDependencies() {
 		return array(
@@ -78,61 +206,6 @@ class PhpunitShell extends AppShell {
 				'vendor_folder' => 'XML'
 			),
 		);
-	}
-	
-	public function install() {
-		$this->out('Installing PHPUnit ..');
-		
-		$Http = new HttpSocket();
-		
-		// Create the _TMP folder to put the files
-		$Folder = new Folder('./vendors/_TMP');
-		$Folder->create('./vendors/_TMP/_target');
-		
-		// Download all files to a temporary location
-		$files = $this->_getDependencies();
-		
-		$Folder = new Folder('./vendors/_TMP');
-		
-		foreach($files as $file) {
-			// Download the file
-			$this->out('Downloading <info>' . $file['name'] . '</info> .. ', 0);
-			$data = $Http->get($file['url']);
-			
-			// Write it to the tmp folder
-			$new_file = new File($Folder->path . DS . $file['file']);
-			$new_file->write($data);
-			$this->out('done.');
-			
-			// Extract the file to the folders
-			$this->out('Extracting .. ', 0);
-			exec('cd '.$Folder->path.' && tar -xzf '.$Folder->path.'/'.$file['file']);
-			$this->out('done.');
-			
-			// Copy the contents to the target folder
-			$this->out('Adding to Vendors .. ', 0);
-			exec('cp -R '.$Folder->path.'/'.(str_replace('.tgz', '', $file['file'])).'/'.$file['vendor_folder']. ' ' .$Folder->path.'/_target');
-			$this->out('done.');
-			
-			$this->hr();
-		}
-		
-		$this->out('Cleaning up install files.');
-		
-		$this->hr();
-		
-		// Copy all the result files to vendors
-		$Folder->cd('./vendors/_TMP/');
-		exec('cp -R '.$Folder->path.'/_target/* '.$Folder->path.'/../../vendors/');
-		
-		// Clean up
-		$Folder->delete('./vendors/_TMP');
-
-		$this->out();
-		$this->out('<info>PHPUnit 3.5.15</info> <warning>has been succesfully installed to your Vendors folder!</warning>');
-		$this->out();
-		
-		$this->hr();
 	}
 
 }
