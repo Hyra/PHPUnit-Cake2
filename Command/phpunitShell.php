@@ -9,7 +9,7 @@ class PhpunitShell extends AppShell {
 		$this->out('Hai There. To install PHPUnit, run `phpunit install`');
 	}
 
-	private function getDependencies() {
+	protected function _getDependencies() {
 		return array(
 			array(
 				'name' => 'PHPUnit 3.5.15',
@@ -79,38 +79,39 @@ class PhpunitShell extends AppShell {
 			),
 		);
 	}
+	
 	public function install() {
 		$this->out('Installing PHPUnit ..');
 		
-		$http = new HttpSocket();
+		$Http = new HttpSocket();
 		
 		// Create the _TMP folder to put the files
-		$folder = new Folder('./vendors/_TMP');
-		$folder->create('./vendors/_TMP/_target');
+		$Folder = new Folder('./vendors/_TMP');
+		$Folder->create('./vendors/_TMP/_target');
 		
 		// Download all files to a temporary location
-		$files = $this->getDependencies();
+		$files = $this->_getDependencies();
 		
-		$folder = new Folder('./vendors/_TMP');
+		$Folder = new Folder('./vendors/_TMP');
 		
 		foreach($files as $file) {
 			// Download the file
 			$this->out('Downloading <info>' . $file['name'] . '</info> .. ', 0);
-			$data = $http->get($file['url']);
+			$data = $Http->get($file['url']);
 			
 			// Write it to the tmp folder
-			$new_file = new File($folder->path . DS . $file['file']);
+			$new_file = new File($Folder->path . DS . $file['file']);
 			$new_file->write($data);
 			$this->out('done.');
 			
 			// Extract the file to the folders
 			$this->out('Extracting .. ', 0);
-			exec('cd '.$folder->path.' && tar -xzf '.$folder->path.'/'.$file['file']);
+			exec('cd '.$Folder->path.' && tar -xzf '.$Folder->path.'/'.$file['file']);
 			$this->out('done.');
 			
 			// Copy the contents to the target folder
 			$this->out('Adding to Vendors .. ', 0);
-			exec('cp -R '.$folder->path.'/'.(str_replace('.tgz', '', $file['file'])).'/'.$file['vendor_folder']. ' ' .$folder->path.'/_target');
+			exec('cp -R '.$Folder->path.'/'.(str_replace('.tgz', '', $file['file'])).'/'.$file['vendor_folder']. ' ' .$Folder->path.'/_target');
 			$this->out('done.');
 			
 			$this->hr();
@@ -121,11 +122,11 @@ class PhpunitShell extends AppShell {
 		$this->hr();
 		
 		// Copy all the result files to vendors
-		$folder->cd('./vendors/_TMP/');
-		exec('cp -R '.$folder->path.'/_target/* '.$folder->path.'/../../vendors/');
+		$Folder->cd('./vendors/_TMP/');
+		exec('cp -R '.$Folder->path.'/_target/* '.$Folder->path.'/../../vendors/');
 		
 		// Clean up
-		$folder->delete('./vendors/_TMP');
+		$Folder->delete('./vendors/_TMP');
 
 		$this->out();
 		$this->out('<info>PHPUnit 3.5.15</info> <warning>has been succesfully installed to your Vendors folder!</warning>');
