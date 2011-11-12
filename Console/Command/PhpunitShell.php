@@ -19,8 +19,13 @@ if (!defined('WINDOWS')) {
  * - supports windows, linux, mac
  * - select vendor path dynamically
  * 
+ * TODOS: 
+ * - params (windows, override, ...)
+ * - tests on more OS
+ * - update functionality for PHPUnit
+ * 
  * @original Stef van den Ham
- * @modified Mark Scherer (Windows Comp.)
+ * @modified Mark Scherer
  * @license MIT License (http://www.opensource.org/licenses/mit-license.php)
  * @cakephp 2.0
  */
