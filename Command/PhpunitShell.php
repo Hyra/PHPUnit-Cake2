@@ -14,23 +14,23 @@ if (!defined('WINDOWS')) {
 
 /**
  * Install PHPUnit for the CakePHP 2.x Test-Framework
- * Phpunit Plugin
- * Place it in your app/Plugin/ dir and open a shell inside your app folder
+ * PHPUnit Plugin
+ * Place it in your app/Plugin/ directory and open a shell inside your app folder
  * 
  * - supports windows, linux, mac
- * - select vendor path dynamically
- * - select version dynamically
+ * - select Vendor path dynamically
+ * - select PHPUnit version dynamically
  * - get package info and a list of supported versions
  * 
- * TODOS: 
+ * TODO'S:
  * - params (windows, override, ...)
- * - tests on more OS
+ * - tests on more OS's
  * - update functionality for PHPUnit
  * 
  * @original Stef van den Ham
  * @modified Mark Scherer
  * @license MIT License (http://www.opensource.org/licenses/mit-license.php)
- * @cakephp 2.0
+ * @CakePHP 2.0
  *
  * @changelog:
  * 2011-11-29 Stef van den Ham
