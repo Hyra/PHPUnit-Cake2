@@ -38,7 +38,12 @@ class PhpunitShell extends AppShell {
 	public function main() {
 		$this->out(__('Hai There. To install PHPUnit %s, run `Phpunit.Phpunit install [version]`'), self::PHPUNIT_VERSION);
 	}
-	
+
+	/**
+	 * list all supported versions
+	 * 
+	 * 2011-11-29 ms
+	 */		
 	public function versions() {
 		$c = 0;
 		foreach ($this->versions as $key => $version) {
@@ -50,7 +55,14 @@ class PhpunitShell extends AppShell {
 			$this->out($key.' : v'.$version.$default);
 		}
 	}
-	
+
+	/**
+	 * list all packages to a specific version
+	 * you can pass the version yuo want to see (3.5, 3.6, ...) as first param:
+	 * "... packages 3.5" for example
+	 * 
+	 * 2011-11-29 ms
+	 */	
 	public function packages() {
 		if (empty($this->args[0])) {
 			$this->out(__('Please provide a version like so:'));
@@ -66,7 +78,13 @@ class PhpunitShell extends AppShell {
 		}
 	}
 
-
+	/**
+	 * main installer
+	 * you can pass the version yuo want to install (3.5, 3.6, ...) as first param:
+	 * "... install 3.5" for example
+	 * 
+	 * 2011-11-29 ms
+	 */
 	public function install() {
 		$v = $this->_getVersion(isset($this->args[0]) ? $this->args[0] : null);
 		
@@ -77,21 +95,20 @@ class PhpunitShell extends AppShell {
 		$path = $this->_getPath();
 		$tmpPath = $path . '_TMP' . DS;
 		
-		// Create the _TMP folder to put the files
+		# Create the _TMP folder to put the files
 		$Folder = new Folder($tmpPath, true);
 		$Folder->create($tmpPath . '_target');
 		
-		// Download all files to a temporary location
+		# Download all files to a temporary location
 		$files = $this->_getDependencies($v);
-		//$files = array(array_shift($files));
 		
 		foreach($files as $file) {
 			if (!file_exists($tmpPath . $file['file']) || !empty($this->params['override'])) {
-				// Download the file
+				# Download the file
 				$this->out(__('Downloading <info>%s</info> .. ', $file['name']), 0);
 				$data = $Http->get($file['url']);
 				
-				// Write it to the tmp folder
+				# Write it to the tmp folder
 				$NewFile = new File($tmpPath . $file['file'], true);
 				if (!$NewFile->write($data)) {
 					$this->error(__('Writing failed'), __('Cannot create tmp files. Aborting.'));
@@ -101,14 +118,16 @@ class PhpunitShell extends AppShell {
 			}
 			
 			
-			// Extract the file to the folders
+			# Extract the file to the folders
 			$this->out(__('Extracting ..'), 0);
 			$this->_extract($tmpPath . $file['file']);
 			$this->out('done.');
 			
-			// Copy the contents to the target folder
+			# Copy the contents to the target folder
+			# Uses the bugfix from my ticket (otherwise you end up with missing folders!!!)
+			# http://cakephp.lighthouseapp.com/projects/42648-cakephp/tickets/2314-folder-class-should-merge-by-default
 			$this->out(__('Adding to Vendors ..'), 0);
-			$Folder->move(array('to'=>$tmpPath . '_target'.DS.$file['folder'].DS, 'from'=>$tmpPath.(str_replace('.tgz', '', $file['file'])).DS.$file['folder'].DS));
+			$Folder->move(array('to'=>$tmpPath . '_target'.DS.$file['folder'].DS, 'from'=>$tmpPath.(str_replace('.tgz', '', $file['file'])).DS.$file['folder'].DS, 'merge'=>true));
 			$this->out('done.');
 			
 			$this->hr();
@@ -117,21 +136,14 @@ class PhpunitShell extends AppShell {
 		$this->out(__('Cleaning up install files.'));
 		
 		$this->hr();
+	
+		$Folder->move(array('to'=>$path, 'from'=>$tmpPath.'_target'.DS, 'merge'=>true));
 		
-		$Folder->move(array('to'=>$path, 'from'=>$tmpPath.'_target'.DS));
-		
-		// Clean up
+		# Clean up
 		$Folder->delete($path . '_TMP'.DS);
 
 		$this->out();
-		$this->out(__('<info>PHPUnit %s</info> <warning>has been successfully installed to your Vendor folder!</warning>', $v));
-	}
-
-	public function clear() {
-		$path = $this->_getPath();
-		$Folder = new Folder($path . '_TMP');
-		$Folder->delete();
-		$this->out('Tmp content deleted');
+		$this->out(__('<info>PHPUnit %s</info> <warning>has been successfully installed to your Vendor folder!</warning>', $this->versions[$v]));
 	}
 
 	protected function _getVersion($v, $detailed = false) {
@@ -160,7 +172,6 @@ class PhpunitShell extends AppShell {
 			exec('tar -xzf '.$file);
 		}
 	}
-	
 	
 	protected function _getPath() {
 		$paths = App::path('Vendor');
