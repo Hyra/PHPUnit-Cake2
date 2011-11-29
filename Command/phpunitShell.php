@@ -7,75 +7,87 @@ class PhpunitShell extends AppShell {
 
 	public function main() {
 		$this->out('Hai There. To install PHPUnit, run `phpunit install`');
+		
+		$files = array(
+			'PHPUnit/Autoload.php',
+			'PHP/CodeCoverage/Filter.php',
+			'File/Iterator/Factory.php',
+		);
+		foreach($files as $file) {
+			$to_change = new File('./vendors/'.$file);
+			$data = $to_change->read();
+			$data = str_replace("require_once '", "require_once ROOT.'/vendors/", $data);
+			$to_change->write($data);
+		}
 	}
-
+	
 	private function getDependencies() {
 		return array(
 			array(
-				'name' => 'PHPUnit 3.5.15',
-				'file' => 'PHPUnit-3.5.15.tgz',
-				'url' => 'http://pear.phpunit.de/get/PHPUnit-3.5.15.tgz',
+				'name' => 'PHPUnit 3.6.4',
+				'file' => 'PHPUnit-3.6.4.tgz',
+				'url' => 'http://pear.phpunit.de/get/PHPUnit-3.6.4.tgz',
 				'vendor_folder' => 'PHPUnit'
 			),
 			array(
-				'name' => 'DB Unit 1.0',
-				'file' => 'DbUnit-1.0.0.tgz',
-				'url' => 'http://pear.phpunit.de/get/DbUnit-1.0.0.tgz',
-				'vendor_folder' => 'PHPUnit'
-			),
-			array(
-				'name' => 'File Iterator 1.2.3',
-				'file' => 'File_Iterator-1.2.3.tgz',
-				'url' => 'http://pear.phpunit.de/get/File_Iterator-1.2.3.tgz',
+				'name' => 'File Iterator 1.3.0',
+				'file' => 'File_Iterator-1.3.0.tgz',
+				'url' => 'http://pear.phpunit.de/get/File_Iterator-1.3.0.tgz',
 				'vendor_folder' => 'File'
 			),
 			array(
-				'name' => 'Text Template 1.0',
-				'file' => 'Text_Template-1.0.0.tgz',
-				'url' => 'http://pear.phpunit.de/get/Text_Template-1.0.0.tgz',
+				'name' => 'Text Template 1.1.1',
+				'file' => 'Text_Template-1.1.1.tgz',
+				'url' => 'http://pear.phpunit.de/get/Text_Template-1.1.1.tgz',
 				'vendor_folder' => 'Text'
 			),
 			array(
-				'name' => 'PHP Code Coverage 1.0.2',
-				'file' => 'PHP_CodeCoverage-1.0.2.tgz',
-				'url' => 'http://pear.phpunit.de/get/PHP_CodeCoverage-1.0.2.tgz',
+				'name' => 'PHP CodeCoverage 1.1.1',
+				'file' => 'PHP_CodeCoverage-1.1.1.tgz',
+				'url' => 'http://pear.phpunit.de/get/PHP_CodeCoverage-1.1.1.tgz',
 				'vendor_folder' => 'PHP'
 			),
 			array(
-				'name' => 'PHP Timer 1.0',
-				'file' => 'PHP_Timer-1.0.0.tgz',
-				'url' => 'http://pear.phpunit.de/get/PHP_Timer-1.0.0.tgz',
+				'name' => 'PHP Timer 1.0.2',
+				'file' => 'PHP_Timer-1.0.2.tgz',
+				'url' => 'http://pear.phpunit.de/get/PHP_Timer-1.0.2.tgz',
 				'vendor_folder' => 'PHP'
 			),
 			array(
-				'name' => 'PHPUnit MockObject 1.0.3',
-				'file' => 'PHPUnit_MockObject-1.0.3.tgz',
-				'url' => 'http://pear.phpunit.de/get/PHPUnit_MockObject-1.0.3.tgz',
+				'name' => 'PHPUnit MockObject 1.1.0',
+				'file' => 'PHPUnit_MockObject-1.1.0.tgz',
+				'url' => 'http://pear.phpunit.de/get/PHPUnit_MockObject-1.1.0.tgz',
 				'vendor_folder' => 'PHPUnit'
 			),
 			array(
-				'name' => 'PHPUnit Selenium 1.0.1',
-				'file' => 'PHPUnit_Selenium-1.0.1.tgz',
-				'url' => 'http://pear.phpunit.de/get/PHPUnit_Selenium-1.0.1.tgz',
-				'vendor_folder' => 'PHPUnit'
-			),
-			array(
-				'name' => 'PHPUnit TokenStream 1.1.0',
-				'file' => 'PHP_TokenStream-1.1.0.tgz',
-				'url' => 'http://pear.phpunit.de/get/PHP_TokenStream-1.1.0.tgz',
+				'name' => 'PHP TokenStream 1.1.1',
+				'file' => 'PHP_TokenStream-1.1.1.tgz',
+				'url' => 'http://pear.phpunit.de/get/PHP_TokenStream-1.1.1.tgz',
 				'vendor_folder' => 'PHP'
 			),
 			array(
-				'name' => 'YAML 1.0.2',
-				'file' => 'YAML-1.0.2.tgz',
-				'url' => 'http://pear.symfony-project.com/get/YAML-1.0.2.tgz',
-				'vendor_folder' => 'lib'
+				'name' => 'DbUnit 1.1.1',
+				'file' => 'DbUnit-1.1.1.tgz',
+				'url' => 'http://pear.phpunit.de/get/DbUnit-1.1.1.tgz',
+				'vendor_folder' => 'PHPUnit'
 			),
 			array(
-				'name' => 'XML RPC2 1.1.1',
-				'file' => 'XML_RPC2-1.1.1.tgz',
-				'url' => 'http://download.pear.php.net/package/XML_RPC2-1.1.1.tgz',
-				'vendor_folder' => 'XML'
+				'name' => 'PHPUnit Story 1.0.0',
+				'file' => 'PHPUnit_Story-1.0.0.tgz',
+				'url' => 'http://pear.phpunit.de/get/PHPUnit_Story-1.0.0.tgz',
+				'vendor_folder' => 'PHPUnit'
+			),
+			array(
+				'name' => 'PHPUnit Selenium 1.1.0',
+				'file' => 'PHPUnit_Selenium-1.1.0.tgz',
+				'url' => 'http://pear.phpunit.de/get/PHPUnit_Selenium-1.1.0.tgz',
+				'vendor_folder' => 'PHPUnit'
+			),
+			array(
+				'name' => 'PHPUnit TicketListener GitHub 1.0.0',
+				'file' => 'PHPUnit_TicketListener_GitHub-1.0.0.tgz',
+				'url' => 'http://pear.phpunit.de/get/PHPUnit_TicketListener_GitHub-1.0.0.tgz',
+				'vendor_folder' => 'PHPUnit'
 			),
 		);
 	}
