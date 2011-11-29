@@ -19,7 +19,7 @@ if (!defined('WINDOWS')) {
  * - supports windows, linux, mac
  * - select vendor path dynamically
  * - select version dynamically
- * - get package info an a list of supported versions
+ * - get package info and a list of supported versions
  * 
  * TODOS: 
  * - params (windows, override, ...)
@@ -70,8 +70,8 @@ class PhpunitShell extends AppShell {
 	public function install() {
 		$v = $this->_getVersion(isset($this->args[0]) ? $this->args[0] : null);
 		
-		$this->out(__('Installing PHPUnit '.$v.' ...'));
-		die();
+		$this->out(__('Installing PHPUnit %s ...', $v));
+		
 		$Http = new HttpSocket();
 		
 		$path = $this->_getPath();
@@ -108,7 +108,7 @@ class PhpunitShell extends AppShell {
 			
 			// Copy the contents to the target folder
 			$this->out(__('Adding to Vendors ..'), 0);
-			$Folder->move(array('to'=>$tmpPath . '_target', 'from'=>$tmpPath.(str_replace('.tgz', '', $file['file'])).DS.$file['folder']));
+			$Folder->move(array('to'=>$tmpPath . '_target'.DS.$file['folder'].DS, 'from'=>$tmpPath.(str_replace('.tgz', '', $file['file'])).DS.$file['folder'].DS));
 			$this->out('done.');
 			
 			$this->hr();
@@ -118,16 +118,13 @@ class PhpunitShell extends AppShell {
 		
 		$this->hr();
 		
-		$Folder->move(array('to'=>$path, 'from'=>$tmpPath.'_target'));
-			
+		$Folder->move(array('to'=>$path, 'from'=>$tmpPath.'_target'.DS));
+		
 		// Clean up
-		$Folder->delete($path . '_TMP');
+		$Folder->delete($path . '_TMP'.DS);
 
 		$this->out();
-		$this->out(__('<info>PHPUnit %s</info> <warning>has been successfully installed to your Vendor folder!</warning>'), $v);
-		$this->out();
-		
-		$this->hr();
+		$this->out(__('<info>PHPUnit %s</info> <warning>has been successfully installed to your Vendor folder!</warning>', $v));
 	}
 
 	public function clear() {
