@@ -37,6 +37,8 @@ class PhpunitShell extends AppShell {
 
 	public function main() {
 		$this->out(__('Hi There. To install PHPUnit %s, run `Phpunit.Phpunit install [version]`', self::PHPUNIT_VERSION));
+		$this->out('Possible versions:');
+		$this->versions();
 	}
 
 	/**
