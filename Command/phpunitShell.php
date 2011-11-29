@@ -7,18 +7,6 @@ class PhpunitShell extends AppShell {
 
 	public function main() {
 		$this->out('Hai There. To install PHPUnit, run `phpunit install`');
-		
-		$files = array(
-			'PHPUnit/Autoload.php',
-			'PHP/CodeCoverage/Filter.php',
-			'File/Iterator/Factory.php',
-		);
-		foreach($files as $file) {
-			$to_change = new File('./vendors/'.$file);
-			$data = $to_change->read();
-			$data = str_replace("require_once '", "require_once ROOT.'/vendors/", $data);
-			$to_change->write($data);
-		}
 	}
 	
 	private function getDependencies() {
