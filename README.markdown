@@ -8,29 +8,11 @@ Because I'm a fan of self-contained systems. Sure, installing PHPUnit through PE
 
 ## Usage
 
-There's 2 ways to install PHPUnit to your CakePHP 2.0 install. Either through a shell, or through a bash script. The first being 70% more awesome of course.
+To install PHPUnit to your CakePHP 2.0 install you can use the Shell.
 
-# Command Shell
+Put the file `PhpunitShell.php` in your `app/Console/Command` folder.
 
-Put the file `phpunitShell.php` in your `app/Console/Command` folder.
-Then run `cake phpunit install`
+Tun `cake phpunit install`
 This will download and extract all the neccesary files, and put them in your `vendors` folder.
-
-# Bash Script
-
-Copy the contents of the `prepare_phpunit` file anywhere on your filesystem.
-Make sure it has permissions and has is executable:
-
-	chmod +X prepare_phpunit
-	chmod 777 prepare_phpunit
-
-execute the file:
-
-	./prepare_phpunit
-
-You end up with a nice file called `PHPUnit_for_Vendor.tar.gz`
-Extract the file into your `vendors` folder.
-
-Done!
 
 You can now use PHPUnit through the CLI or your favourite browser.
