@@ -1,4 +1,5 @@
 <?php
+
 App::uses('Folder', 'Utility');
 App::uses('File', 'Utility');
 App::uses('HttpSocket', 'Network/Http');
@@ -30,7 +31,16 @@ if (!defined('WINDOWS')) {
  * @modified Mark Scherer
  * @license MIT License (http://www.opensource.org/licenses/mit-license.php)
  * @cakephp 2.0
+ *
+ * @changelog:
+ * 2011-11-29 Stef van den Ham
+ * - Upgraded to 3.6.4
+ * 2011-11-29 Mark Scherer
+ * - Added Windows compatibility
+ * - Added Version select dynamically
+ * - Added Path select dynamically
  */
+
 class PhpunitShell extends AppShell {
 
 	const PHPUNIT_VERSION = '3.6.4';
