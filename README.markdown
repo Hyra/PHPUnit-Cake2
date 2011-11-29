@@ -1,3 +1,10 @@
+## Update 2011-11-29
+
+PHPUnit Installer now supports both 3.5 and 3.6
+
+BIG thanks to Mark Scherer for adding windows support for the installation shell as well as making selecting version and vendor path dynamic.
+The Shell is now 67% more awesome.
+
 ## What?
 
 This "installer" prepares all the dependencies needed to use PHPUnit with CakePHP 2.0 through the use of vendor files.
