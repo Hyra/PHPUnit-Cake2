@@ -1,6 +1,8 @@
 <?php
 
-App::uses('Folder', 'Utility');
+#needs our own bugfixed Folder class (can merge recursivly as one might expect from a copy command)
+App::uses('Folder', 'Phpunit.Utility');
+
 App::uses('File', 'Utility');
 App::uses('HttpSocket', 'Network/Http');
 
