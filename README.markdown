@@ -20,4 +20,7 @@ To install PHPUnit to your CakePHP 2.0 install you can use the Shell.
 Run `Phpunit.Phpunit install` directly from your console.
 This will download and extract all the necessary files, and put them in your specified `Vendor` folder.
 
+Make sure you got `CakePlugin::loadAll()` - or specifically `CakePlugin::load('Phpunit')` in your bootstrap!
+Otherwise the plugin will not be available.
+
 You can now use PHPUnit through the CLI or your favourite browser.
