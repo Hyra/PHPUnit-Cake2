@@ -1,7 +1,7 @@
 <?php
 
 #needs our own bugfixed Folder class (can merge recursivly as one might expect from a copy command)
-App::uses('Folder', 'Phpunit.Utility');
+App::uses('FolderExt', 'Phpunit.Utility');
 
 App::uses('File', 'Utility');
 App::uses('HttpSocket', 'Network/Http');
@@ -36,7 +36,7 @@ if (!defined('WINDOWS')) {
  *
  * @changelog:
  * 2011-11-29 Stef van den Ham
- * - Upgraded to 3.6.4
+ * - Upgraded to 3.6.10
  * 2011-11-29 Mark Scherer
  * - Added Windows compatibility
  * - Added Version select dynamically
@@ -45,7 +45,7 @@ if (!defined('WINDOWS')) {
 
 class PhpunitShell extends AppShell {
 
-	const PHPUNIT_VERSION = '3.6.4';
+	const PHPUNIT_VERSION = '3.6.10';
 
 	public function main() {
 		$this->out(__('Hi There. To install PHPUnit %s, run `Phpunit.Phpunit install [version]`', self::PHPUNIT_VERSION));
@@ -110,7 +110,7 @@ class PhpunitShell extends AppShell {
 		$tmpPath = $path . '_TMP' . DS;
 		
 		# Create the _TMP folder to put the files
-		$Folder = new Folder($tmpPath, true);
+		$Folder = new FolderExt($tmpPath, true);
 		$Folder->create($tmpPath . '_target');
 		
 		# Download all files to a temporary location
@@ -141,16 +141,15 @@ class PhpunitShell extends AppShell {
 			# Uses the bugfix from my ticket (otherwise you end up with missing folders!!!)
 			# http://cakephp.lighthouseapp.com/projects/42648-cakephp/tickets/2314-folder-class-should-merge-by-default
 			$this->out(__('Adding to Vendors ..'), 0);
-			$Folder->move(array('to'=>$tmpPath . '_target'.DS.$file['folder'].DS, 'from'=>$tmpPath.(str_replace('.tgz', '', $file['file'])).DS.$file['folder'].DS, 'merge'=>true));
+			$Folder->move(array('to'=>$tmpPath . '_target'.DS.$file['folder'].DS, 'from'=>$tmpPath.(str_replace('.tgz', '', $file['file'])).DS.$file['folder'].DS));
 			$this->out('done.');
 			
 			$this->hr();
 		}
 
 		$this->out(__('Cleaning up install files.'));
-		
 		$this->hr();
-	
+
 		$Folder->move(array('to'=>$path, 'from'=>$tmpPath.'_target'.DS, 'merge'=>true));
 		
 		# Clean up
@@ -213,37 +212,39 @@ class PhpunitShell extends AppShell {
 	 */
 	protected function _getDependencies($v = null) {
 		$v = $this->_getVersion($v);
-		return $this->files[$v]; 
+		$files = $this->files[$v];
+		foreach ($files as $key => $value) {
+			if (!isset($value['file'])) {
+				$files[$key]['file'] = basename($value['url']);
+			}
+			if (!isset($value['name'])) {
+				$files[$key]['name'] = str_replace(array('_', '-'), ' ', basename($files[$key]['file'], '.tgz'));
+			}
+		}
+		return $files; 
 	}
 	
 	protected $versions = array(
-		'3.6' => '3.6.4',
+		//'3.7' => '3.7.0',
+		'3.6' => '3.6.10',
 		'3.5' => '3.5.15',
 	);
 	
 	protected $files = array(
 			'3.6' => array(
 				array(
-					'name' => 'PHPUnit 3.6.4',
-					'file' => 'PHPUnit-3.6.4.tgz',
-					'url' => 'http://pear.phpunit.de/get/PHPUnit-3.6.4.tgz',
+					'url' => 'http://pear.phpunit.de/get/PHPUnit-3.6.10.tgz',
 					'folder' => 'PHPUnit'
 				),
 				array(
-					'name' => 'File Iterator 1.3.0',
-					'file' => 'File_Iterator-1.3.0.tgz',
-					'url' => 'http://pear.phpunit.de/get/File_Iterator-1.3.0.tgz',
+					'url' => 'http://pear.phpunit.de/get/File_Iterator-1.3.1.tgz',
 					'folder' => 'File'
 				),
 				array(
-					'name' => 'Text Template 1.1.1',
-					'file' => 'Text_Template-1.1.1.tgz',
 					'url' => 'http://pear.phpunit.de/get/Text_Template-1.1.1.tgz',
 					'folder' => 'Text'
 				),
 				array(
-					'name' => 'PHP CodeCoverage 1.1.1',
-					'file' => 'PHP_CodeCoverage-1.1.1.tgz',
 					'url' => 'http://pear.phpunit.de/get/PHP_CodeCoverage-1.1.1.tgz',
 					'folder' => 'PHP'
 				),
@@ -254,38 +255,26 @@ class PhpunitShell extends AppShell {
 					'folder' => 'PHP'
 				),
 				array(
-					'name' => 'PHPUnit MockObject 1.1.0',
-					'file' => 'PHPUnit_MockObject-1.1.0.tgz',
-					'url' => 'http://pear.phpunit.de/get/PHPUnit_MockObject-1.1.0.tgz',
+					'url' => 'http://pear.phpunit.de/get/PHPUnit_MockObject-1.1.1.tgz',
 					'folder' => 'PHPUnit'
 				),
 				array(
-					'name' => 'PHP TokenStream 1.1.1',
-					'file' => 'PHP_TokenStream-1.1.1.tgz',
-					'url' => 'http://pear.phpunit.de/get/PHP_TokenStream-1.1.1.tgz',
+					'url' => 'http://pear.phpunit.de/get/PHP_TokenStream-1.1.2.tgz',
 					'folder' => 'PHP'
 				),
 				array(
-					'name' => 'DbUnit 1.1.1',
-					'file' => 'DbUnit-1.1.1.tgz',
-					'url' => 'http://pear.phpunit.de/get/DbUnit-1.1.1.tgz',
+					'url' => 'http://pear.phpunit.de/get/DbUnit-1.1.2.tgz',
 					'folder' => 'PHPUnit'
 				),
 				array(
-					'name' => 'PHPUnit Story 1.0.0',
-					'file' => 'PHPUnit_Story-1.0.0.tgz',
 					'url' => 'http://pear.phpunit.de/get/PHPUnit_Story-1.0.0.tgz',
 					'folder' => 'PHPUnit'
 				),
 				array(
-					'name' => 'PHPUnit Selenium 1.1.0',
-					'file' => 'PHPUnit_Selenium-1.1.0.tgz',
-					'url' => 'http://pear.phpunit.de/get/PHPUnit_Selenium-1.1.0.tgz',
+					'url' => 'http://pear.phpunit.de/get/PHPUnit_Selenium-1.1.3.tgz',
 					'folder' => 'PHPUnit'
 				),
 				array(
-					'name' => 'PHPUnit TicketListener GitHub 1.0.0',
-					'file' => 'PHPUnit_TicketListener_GitHub-1.0.0.tgz',
 					'url' => 'http://pear.phpunit.de/get/PHPUnit_TicketListener_GitHub-1.0.0.tgz',
 					'folder' => 'PHPUnit'
 				),		
