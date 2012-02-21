@@ -22,6 +22,7 @@ Otherwise the plugin will not be available.
 
 You can now use PHPUnit through the CLI or your favourite browser.
 
+It works with Linux and Windows. Please report any problems.
 
 ## Credits
 
