@@ -1,9 +1,6 @@
-## Update 2011-11-29
+## Update 2012-02-21
 
-PHPUnit Installer now supports both 3.5 and 3.6
-
-BIG thanks to Mark Scherer for adding windows support for the installation shell as well as making selecting version and vendor path dynamic.
-The Shell is now 67% more awesome.
+PHPUnit Installer now supports both 3.5 and 3.6 (currently 3.6.10)
 
 ## What?
 
@@ -24,3 +21,9 @@ Make sure you got `CakePlugin::loadAll()` - or specifically `CakePlugin::load('P
 Otherwise the plugin will not be available.
 
 You can now use PHPUnit through the CLI or your favourite browser.
+
+
+## Credits
+
+BIG thanks to Mark Scherer for adding windows support for the installation shell as well as making selecting version and vendor path dynamic.
+The Shell is now 67% more awesome.
