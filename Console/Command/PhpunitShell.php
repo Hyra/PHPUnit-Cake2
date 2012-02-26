@@ -158,6 +158,111 @@ class PhpunitShell extends AppShell {
 		$this->out();
 		$this->out(__('<info>PHPUnit %s</info> <warning>has been successfully installed to your Vendor folder!</warning>', $this->versions[$v]));
 	}
+	
+	/**
+	 * get a list of the current versions of all used pear packages via phpunit channel
+	 * needs pear package to be installed
+	 * you can easily check that typing `pear` in CLI.
+	 * 
+	 * It will also display if there is an update to one of our head packages.
+	 * 
+	 * You can manually update those version numbers in the $files array below to get those new versions.
+	 * Or you can issue a ticket or a pull request for this plugin at github for us to update it. 
+	 * 
+	 * possible params:
+	 * -v: verbose output (display the description for each package, as well)
+	 * 
+	 * 2012-02-26 ms 
+	 */
+	public function pear_info() {
+		exec('pear list-channels', $output, $ret);
+		if ($ret !== 0) {
+			$this->error(__('Pear package not available. Please install using `apt-get install pear` etc.'));
+		}
+		$phpunitChannel = false;
+		foreach ($output as $row) {
+			if (strpos($row, 'pear.phpunit.de') !== false) {
+				$phpunitChannel = true;
+			}
+		}
+		if (!$phpunitChannel) {
+			exec('pear list-channels', $output, $ret);
+			if ($ret !== 0) {
+				$this->error(__('Pear channel `%s` cannot be discovered.', 'pear.phpunit.de'));
+			}
+			$phpunitChannel = true;
+		}
+		
+		exec('pear list-all -c phpunit', $output, $ret);
+		
+		# pear list of current packages
+		$res = array();
+		foreach ($output as $row) {
+			if (!isset($packages) && strpos($row, 'PACKAGE') === 0) {
+				$packages = true;
+				continue;
+			}
+			if (!isset($packages)) {
+				continue;
+			}
+			preg_match('/^(.*)\b\s+\b([0-9\.]*)\b\s+\b(.*)$/', $row, $tmp);
+			array_shift($tmp);
+			foreach ($tmp as $key => $val) {
+				$tmp[$key] = trim($val);
+				$name = substr($tmp[0], strrpos($tmp[0], '/')+1);
+			}
+			$res[$name] = $tmp;
+			
+		}
+		
+		# our list of packages
+		$packages = $this->_getDependencies();
+		
+		# lets match them
+		$result = array();
+		
+		foreach ($packages as $package) {
+			list($identifier, $version) = explode('-', $package['file'], 2);
+			$version = substr($version, 0, strrpos($version, '.'));
+			
+	
+			if (!isset($res[$identifier])) {
+				$this->error(__('Missing package').': '.$identifier);
+			}
+			$pearPackage = $res[$identifier];
+			unset($res[$identifier]);
+			
+			$package['description'] = $pearPackage[2];
+			$package['head'] = $pearPackage[1];
+			$package['current'] = $version;
+			
+			$result[] = $package;
+		}
+
+		$this->out('');
+		foreach ($result as $row) {
+			$this->out('# '.$row['name']. '');
+			if ($row['current'] == $row['head']) {
+				$this->out("\t" . 'OK (v'.$row['current'].')');
+			} else {
+				$this->out("\t" . __('UPDATE to v%s available (currently v%s)', $row['head'], $row['current']));
+			}
+			if (!empty($this->params['verbose'])) {
+				$this->out($this->wrapText($row['description'], array('indent'=>"\t")));
+			}
+		}
+		
+		$this->hr();
+		$this->out(__('Unused pear packages') . ':');
+		foreach ($res as $key => $val) {
+			$this->out('# '.$key.' (v'.$val[1].')');
+			if (!empty($this->params['verbose'])) {
+				$this->out($this->wrapText($val[2], array('indent'=>"\t")));
+			}
+		}
+		
+	}
+	
 
 	protected function _getVersion($v, $detailed = false) {
 		if (strlen($v) > 3) {
