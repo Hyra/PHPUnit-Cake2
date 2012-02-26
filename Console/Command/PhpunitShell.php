@@ -182,7 +182,7 @@ class PhpunitShell extends AppShell {
 	public function pear_info() {
 		exec('pear list-channels', $output, $ret);
 		if ($ret !== 0) {
-			$this->error(__('Pear package not available. Please install using `apt-get install pear` etc.'));
+			$this->error(__('Pear package not available. Please install using `apt-get install php-pear` etc.'));
 		}
 		$phpunitChannel = false;
 		foreach ($output as $row) {
