@@ -245,7 +245,7 @@ class PhpunitShell extends AppShell {
 					'folder' => 'Text'
 				),
 				array(
-					'url' => 'http://pear.phpunit.de/get/PHP_CodeCoverage-1.1.1.tgz',
+					'url' => 'http://pear.phpunit.de/get/PHP_CodeCoverage-1.1.2.tgz',
 					'folder' => 'PHP'
 				),
 				array(
@@ -259,7 +259,7 @@ class PhpunitShell extends AppShell {
 					'folder' => 'PHPUnit'
 				),
 				array(
-					'url' => 'http://pear.phpunit.de/get/PHP_TokenStream-1.1.2.tgz',
+					'url' => 'http://pear.phpunit.de/get/PHP_TokenStream-1.1.3.tgz',
 					'folder' => 'PHP'
 				),
 				array(
@@ -271,7 +271,7 @@ class PhpunitShell extends AppShell {
 					'folder' => 'PHPUnit'
 				),
 				array(
-					'url' => 'http://pear.phpunit.de/get/PHPUnit_Selenium-1.1.3.tgz',
+					'url' => 'http://pear.phpunit.de/get/PHPUnit_Selenium-1.2.3.tgz',
 					'folder' => 'PHPUnit'
 				),
 				array(
