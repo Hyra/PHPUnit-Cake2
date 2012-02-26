@@ -48,9 +48,14 @@ class PhpunitShell extends AppShell {
 	const PHPUNIT_VERSION = '3.6.10';
 
 	public function main() {
-		$this->out(__('Hi There. To install PHPUnit %s, run `Phpunit.Phpunit install [version]`', self::PHPUNIT_VERSION));
+		$this->out(__('Hi There. To install PHPUnit, run `Phpunit.Phpunit install [version]`'));
 		$this->out('Possible versions:');
 		$this->versions();
+		
+		$this->out();
+		$this->out(__('Additional info via'));
+		$this->out(__('- packages [version] (pear packages including version numbers)'));
+		$this->out(__('- pear_info [-v] (comparison to current versions on the pear network)'));
 	}
 
 	/**
