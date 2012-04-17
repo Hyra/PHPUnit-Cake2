@@ -25,6 +25,14 @@ You can now use PHPUnit through the CLI or your favourite browser by using the n
 
 It works with Linux and Windows. Please report any problems.
 
+## Autoload
+
+If you have it installed in your ROOT vendors and get some include warnings while baking put this at the top of the VENDORS/PHPUnit/Autoload.php file:
+
+    set_include_path(get_include_path().PATH_SEPARATOR.dirname(dirname(__FILE__)));
+    
+This way the vendors folder itself is also an include path and those warnings will go away.
+
 ## Credits
 
 BIG thanks to Mark Scherer for adding Windows support for the installation shell as well as making selecting version and vendor path dynamic.
