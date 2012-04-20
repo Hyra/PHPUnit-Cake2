@@ -381,7 +381,7 @@ class PhpunitShell extends AppShell {
 					'folder' => 'PHPUnit'
 				),
 				array(
-					'url' => 'http://pear.phpunit.de/get/PHPUnit_Selenium-1.2.3.tgz',
+					'url' => 'http://pear.phpunit.de/get/PHPUnit_Selenium-1.2.6.tgz',
 					'folder' => 'PHPUnit'
 				),
 				array(
