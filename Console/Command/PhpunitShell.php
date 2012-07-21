@@ -43,6 +43,8 @@ if (!defined('WINDOWS')) {
  * - Added Windows compatibility
  * - Added Version select dynamically
  * - Added Path select dynamically
+ * 2012-07-21
+ * - non-pear-fallback for info() and minor improvements, test case added
  */
 
 class PhpunitShell extends AppShell {
@@ -57,7 +59,7 @@ class PhpunitShell extends AppShell {
 		$this->out();
 		$this->out(__('Additional info via'));
 		$this->out(__('- packages [version] (pear packages including version numbers)'));
-		$this->out(__('- pear_info [-v] (comparison to current versions on the pear network)'));
+		$this->out(__('- info [-v] (comparison to current versions on the pear network)'));
 	}
 
 	/**
@@ -90,7 +92,7 @@ class PhpunitShell extends AppShell {
 			$this->out('`Phpunit.Phpunit packages 3.x`');
 			$this->out();
 			$this->versions();
-			exit();
+			return;
 		}
 		$packages = $this->_getDependencies($this->args[0]);
 		
@@ -181,7 +183,7 @@ class PhpunitShell extends AppShell {
 	 * 
 	 * 2012-02-26 ms 
 	 */
-	public function pear_info() {
+	public function info() {
 		if (WINDOWS) {
 			$officialList = $this->_pear_info_xml();
 		} else {

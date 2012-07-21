@@ -1,10 +1,10 @@
 ## Update 2012-02-21
 
-PHPUnit Installer now supports both 3.5 and 3.6 (currently 3.6.10)
+PHPUnit Installer now supports both 3.5 and 3.6 (currently 3.6.11)
 
 ## What?
 
-This "installer" prepares all the dependencies needed to use PHPUnit with CakePHP 2.0 through the use of vendor files.
+This "installer" prepares all the dependencies needed to use PHPUnit with CakePHP 2.x through the use of vendor files.
 
 ## Why?
 
@@ -12,7 +12,7 @@ Because I'm a fan of self-contained systems. Sure, installing PHPUnit through PE
 
 ## Usage
 
-To install PHPUnit to your CakePHP 2.0 install you can use the Shell.
+To install PHPUnit to your CakePHP 2.x install you can use the Shell.
 
 Run `Phpunit.Phpunit install` directly from your console.
 This will download and extract all the necessary files, and put them in your specified `Vendor` folder.
@@ -32,7 +32,10 @@ If you have it installed in your ROOT vendors and get some include warnings whil
     
 This way the vendors folder itself is also an include path and those warnings will go away.
 
+## Checking for updates
+
+Running `Phpunit.Phpunit info` you can check for updates.
+
 ## Credits
 
-BIG thanks to Mark Scherer for adding windows support for the installation shell as well as making selecting version and vendor path dynamic.
-The Shell is now 67% more awesome.
+Mark Scherer (dereuromark) and Stef van den Ham (Hyra)
