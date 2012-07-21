@@ -240,6 +240,9 @@ class PhpunitShell extends AppShell {
 		
 	}
 	
+	/**
+	 * @return array
+	 */	
 	protected function _pear_info() {
 		exec('pear list-channels', $output, $ret);
 		if ($ret !== 0) {
@@ -285,7 +288,10 @@ class PhpunitShell extends AppShell {
 		return $res;
 	}
 	
-	public function _pear_info_xml() {
+	/**
+	 * @return array
+	 */
+	protected function _pear_info_xml() {
 		App::uses('Xml', 'Utility');
 		$Xml = Xml::build('http://pear.phpunit.de/feed.xml');
 		$packages = Xml::toArray($Xml);
