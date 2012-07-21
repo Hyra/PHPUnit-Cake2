@@ -34,7 +34,7 @@ This way the vendors folder itself is also an include path and those warnings wi
 
 ## Checking for updates
 
-Running `Phpunit.Phpunit info` you can check for updates.
+Running `Phpunit.Phpunit info` you can check for updates. This is mainly for maintaining the plugin and keeping it up to date.
 
 ## Credits
 
