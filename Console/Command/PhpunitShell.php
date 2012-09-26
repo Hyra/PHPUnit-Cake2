@@ -1,4 +1,5 @@
 <?php
+App::uses('AppShell', 'Console/Command');
 
 #needs our own bugfixed Folder class (can merge recursivly as one might expect from a copy command)
 App::uses('FolderExt', 'Phpunit.Utility');
@@ -23,6 +24,7 @@ if (!defined('WINDOWS')) {
  * - select Vendor path dynamically
  * - select PHPUnit version dynamically
  * - get package info and a list of supported versions
+ * - does NOT require pear package to be installed
  * 
  * TODO'S:
  * - params (windows, override, ...)
@@ -36,16 +38,18 @@ if (!defined('WINDOWS')) {
  *
  * @changelog:
  * 2011-11-29 Stef van den Ham
- * - Upgraded to 3.6.10
+ * - Upgraded to 3.6.11
  * 2011-11-29 Mark Scherer
  * - Added Windows compatibility
  * - Added Version select dynamically
  * - Added Path select dynamically
+ * 2012-07-21
+ * - non-pear-fallback for info() and minor improvements, test case added
  */
 
 class PhpunitShell extends AppShell {
 
-	const PHPUNIT_VERSION = '3.6.10';
+	const PHPUNIT_VERSION = '3.6.11';
 
 	public function main() {
 		$this->out(__('Hi There. To install PHPUnit, run `Phpunit.Phpunit install [version]`'));
@@ -55,7 +59,7 @@ class PhpunitShell extends AppShell {
 		$this->out();
 		$this->out(__('Additional info via'));
 		$this->out(__('- packages [version] (pear packages including version numbers)'));
-		$this->out(__('- pear_info [-v] (comparison to current versions on the pear network)'));
+		$this->out(__('- info [-v] (comparison to current versions on the pear network)'));
 	}
 
 	/**
@@ -88,7 +92,7 @@ class PhpunitShell extends AppShell {
 			$this->out('`Phpunit.Phpunit packages 3.x`');
 			$this->out();
 			$this->versions();
-			exit();
+			return;
 		}
 		$packages = $this->_getDependencies($this->args[0]);
 		
@@ -179,47 +183,17 @@ class PhpunitShell extends AppShell {
 	 * 
 	 * 2012-02-26 ms 
 	 */
-	public function pear_info() {
-		exec('pear list-channels', $output, $ret);
-		if ($ret !== 0) {
-			$this->error(__('Pear package not available. Please install using `apt-get install php-pear` etc.'));
-		}
-		$phpunitChannel = false;
-		foreach ($output as $row) {
-			if (strpos($row, 'pear.phpunit.de') !== false) {
-				$phpunitChannel = true;
+	public function info() {
+		if (WINDOWS) {
+			$officialList = $this->_pear_info_xml();
+		} else {
+			try {
+				$officialList = $this->_pear_info();
+			} catch (Exception $e) {
+				$officialList = $this->_pear_info_xml();
 			}
 		}
-		if (!$phpunitChannel) {
-			exec('pear list-channels', $output, $ret);
-			if ($ret !== 0) {
-				$this->error(__('Pear channel `%s` cannot be discovered.', 'pear.phpunit.de'));
-			}
-			$phpunitChannel = true;
-		}
-		
-		exec('pear list-all -c phpunit', $output, $ret);
-		
-		# pear list of current packages
-		$res = array();
-		foreach ($output as $row) {
-			if (!isset($packages) && strpos($row, 'PACKAGE') === 0) {
-				$packages = true;
-				continue;
-			}
-			if (!isset($packages)) {
-				continue;
-			}
-			preg_match('/^(.*)\b\s+\b([0-9\.]*)\b\s+\b(.*)$/', $row, $tmp);
-			array_shift($tmp);
-			foreach ($tmp as $key => $val) {
-				$tmp[$key] = trim($val);
-				$name = substr($tmp[0], strrpos($tmp[0], '/')+1);
-			}
-			$res[$name] = $tmp;
-			
-		}
-		
+
 		# our list of packages
 		$packages = $this->_getDependencies();
 		
@@ -231,11 +205,11 @@ class PhpunitShell extends AppShell {
 			$version = substr($version, 0, strrpos($version, '.'));
 			
 	
-			if (!isset($res[$identifier])) {
+			if (!isset($officialList[$identifier])) {
 				$this->error(__('Missing package').': '.$identifier);
 			}
-			$pearPackage = $res[$identifier];
-			unset($res[$identifier]);
+			$pearPackage = $officialList[$identifier];
+			unset($officialList[$identifier]);
 			
 			$package['description'] = $pearPackage[2];
 			$package['head'] = $pearPackage[1];
@@ -259,13 +233,95 @@ class PhpunitShell extends AppShell {
 		
 		$this->hr();
 		$this->out(__('Unused pear packages') . ':');
-		foreach ($res as $key => $val) {
+		foreach ($officialList as $key => $val) {
 			$this->out('# '.$key.' (v'.$val[1].')');
 			if (!empty($this->params['verbose'])) {
 				$this->out($this->wrapText($val[2], array('indent'=>"\t")));
 			}
 		}
 		
+	}
+	
+	/**
+	 * @return array
+	 */	
+	protected function _pear_info() {
+		exec('pear list-channels', $output, $ret);
+		if ($ret !== 0) {
+			throw new CakeException(__('Pear package not available. Please install using `apt-get install php-pear`'));
+		}
+		/*
+		$phpunitChannel = false;
+		foreach ($output as $row) {
+			if (strpos($row, 'pear.phpunit.de') !== false) {
+				$phpunitChannel = true;
+			}
+		}
+		if (!$phpunitChannel) {
+			exec('pear list-channels', $output, $ret);
+			if ($ret !== 0) {
+				throw new CakeException(__('Pear channel `%s` cannot be discovered.', 'pear.phpunit.de'));
+			}
+			$phpunitChannel = true;
+		}
+		*/
+		
+		exec('pear list-all -c phpunit', $output, $ret);
+		
+		# pear list of current packages
+		$res = array();
+		foreach ($output as $row) {
+			if (!isset($packages) && strpos($row, 'PACKAGE') === 0) {
+				$packages = true;
+				continue;
+			}
+			if (!isset($packages)) {
+				continue;
+			}
+			preg_match('/^(.*)\b\s+\b([0-9\.]*)\b\s+\b(.*)$/', $row, $tmp);
+			array_shift($tmp);
+			foreach ($tmp as $key => $val) {
+				$tmp[$key] = trim($val);
+				$name = substr($tmp[0], strrpos($tmp[0], '/')+1);
+			}
+			$res[$name] = $tmp;
+			
+		}
+		return $res;
+	}
+	
+	/**
+	 * @return array
+	 */
+	protected function _pear_info_xml() {
+		App::uses('Xml', 'Utility');
+		$Xml = Xml::build('http://pear.phpunit.de/feed.xml');
+		$packages = Xml::toArray($Xml);
+		if (empty($packages['feed']['entry'])) {
+			throw new CakeException('Could not read xml feed');
+		}
+		$packages = $packages['feed']['entry'];
+		$res = array();
+		foreach ($packages as $package) {
+			$p = array();
+			$package['title'] = str_replace(array('(', ')'), '', $package['title']);
+			preg_match('/^(.+)\b\s+\b([0-9\.]+)\b\s+\b(.+)$/', $package['title'], $tmp);
+			if (empty($tmp)) {
+				continue;
+			}
+			$name = $tmp[1];
+			$version = $tmp[2];
+			if (isset($res[$name])) {
+				continue;
+			}
+			$p = array(
+				0 => 'phpunit/'.$name,
+				1 => $version,
+				2 => $package['content']
+			);
+			$res[$name] = $p;
+		}
+		return $res;
 	}
 	
 
@@ -336,14 +392,14 @@ class PhpunitShell extends AppShell {
 	
 	protected $versions = array(
 		//'3.7' => '3.7.0',
-		'3.6' => '3.6.10',
+		'3.6' => '3.6.11',
 		'3.5' => '3.5.15',
 	);
 	
 	protected $files = array(
 			'3.6' => array(
 				array(
-					'url' => 'http://pear.phpunit.de/get/PHPUnit-3.6.10.tgz',
+					'url' => 'http://pear.phpunit.de/get/PHPUnit-3.6.11.tgz',
 					'folder' => 'PHPUnit'
 				),
 				array(
@@ -355,12 +411,10 @@ class PhpunitShell extends AppShell {
 					'folder' => 'Text'
 				),
 				array(
-					'url' => 'http://pear.phpunit.de/get/PHP_CodeCoverage-1.1.2.tgz',
+					'url' => 'http://pear.phpunit.de/get/PHP_CodeCoverage-1.1.3.tgz',
 					'folder' => 'PHP'
 				),
 				array(
-					'name' => 'PHP Timer 1.0.2',
-					'file' => 'PHP_Timer-1.0.2.tgz',
 					'url' => 'http://pear.phpunit.de/get/PHP_Timer-1.0.2.tgz',
 					'folder' => 'PHP'
 				),
@@ -381,7 +435,7 @@ class PhpunitShell extends AppShell {
 					'folder' => 'PHPUnit'
 				),
 				array(
-					'url' => 'http://pear.phpunit.de/get/PHPUnit_Selenium-1.2.3.tgz',
+					'url' => 'http://pear.phpunit.de/get/PHPUnit_Selenium-1.2.7.tgz',
 					'folder' => 'PHPUnit'
 				),
 				array(
