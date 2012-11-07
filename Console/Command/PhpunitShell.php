@@ -49,7 +49,7 @@ if (!defined('WINDOWS')) {
 
 class PhpunitShell extends AppShell {
 
-	const PHPUNIT_VERSION = '3.6.11';
+	const PHPUNIT_VERSION = '3.7.8';
 
 	public function main() {
 		$this->out(__('Hi There. To install PHPUnit, run `Phpunit.Phpunit install [version]`'));
@@ -391,12 +391,58 @@ class PhpunitShell extends AppShell {
 	}
 	
 	protected $versions = array(
-		//'3.7' => '3.7.0',
+		'3.7' => '3.7.8',
 		'3.6' => '3.6.11',
 		'3.5' => '3.5.15',
 	);
 	
 	protected $files = array(
+			'3.7' => array(
+				array(
+					'url' => 'http://pear.phpunit.de/get/PHPUnit-3.7.8.tgz',
+					'folder' => 'PHPUnit'
+				),
+				array(
+					'url' => 'http://pear.phpunit.de/get/File_Iterator-1.3.1.tgz',
+					'folder' => 'File'
+				),
+				array(
+					'url' => 'http://pear.phpunit.de/get/Text_Template-1.1.1.tgz',
+					'folder' => 'Text'
+				),
+				array(
+					'url' => 'http://pear.phpunit.de/get/PHP_CodeCoverage-1.1.3.tgz',
+					'folder' => 'PHP'
+				),
+				array(
+					'url' => 'http://pear.phpunit.de/get/PHP_Timer-1.0.2.tgz',
+					'folder' => 'PHP'
+				),
+				array(
+					'url' => 'http://pear.phpunit.de/get/PHPUnit_MockObject-1.1.1.tgz',
+					'folder' => 'PHPUnit'
+				),
+				array(
+					'url' => 'http://pear.phpunit.de/get/PHP_TokenStream-1.1.3.tgz',
+					'folder' => 'PHP'
+				),
+				array(
+					'url' => 'http://pear.phpunit.de/get/DbUnit-1.1.2.tgz',
+					'folder' => 'PHPUnit'
+				),
+				array(
+					'url' => 'http://pear.phpunit.de/get/PHPUnit_Story-1.0.0.tgz',
+					'folder' => 'PHPUnit'
+				),
+				array(
+					'url' => 'http://pear.phpunit.de/get/PHPUnit_Selenium-1.2.7.tgz',
+					'folder' => 'PHPUnit'
+				),
+				array(
+					'url' => 'http://pear.phpunit.de/get/PHPUnit_TicketListener_GitHub-1.0.0.tgz',
+					'folder' => 'PHPUnit'
+				),		
+			),
 			'3.6' => array(
 				array(
 					'url' => 'http://pear.phpunit.de/get/PHPUnit-3.6.11.tgz',
