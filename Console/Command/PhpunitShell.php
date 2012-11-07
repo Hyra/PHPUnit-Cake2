@@ -2,7 +2,7 @@
 App::uses('AppShell', 'Console/Command');
 
 #needs our own bugfixed Folder class (can merge recursivly as one might expect from a copy command)
-App::uses('FolderExt', 'Phpunit.Utility');
+App::uses('FolderExt', 'PHPUnit.Utility');
 
 App::uses('File', 'Utility');
 App::uses('HttpSocket', 'Network/Http');
