@@ -44,11 +44,11 @@ if (!defined('WINDOWS')) {
  * 2012-07-21
  * - non-pear-fallback for info() and minor improvements, test case added
  * 2012-09-21 ms
- * - Upgraded to 3.7.8 and Cake2.3
+ * - Upgraded to 3.7.9 and Cake2.3
  */
 class PhpunitShell extends AppShell {
 
-	const PHPUNIT_VERSION = '3.7.8';
+	const PHPUNIT_VERSION = '3.7.9';
 
 	public function main() {
 		$this->out(__('Hi There. To install PHPUnit, run `Phpunit.Phpunit install [version]`'));
@@ -393,7 +393,7 @@ class PhpunitShell extends AppShell {
 	}
 
 	protected $versions = array(
-		'3.7' => '3.7.8',
+		'3.7' => '3.7.9',
 		'3.6' => '3.6.11',
 		'3.5' => '3.5.15',
 	);
