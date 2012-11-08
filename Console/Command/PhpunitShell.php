@@ -1,10 +1,8 @@
 <?php
 App::uses('AppShell', 'Console/Command');
-
-#needs our own bugfixed Folder class (can merge recursivly as one might expect from a copy command)
-App::uses('FolderExt', 'PHPUnit.Utility');
-
+App::uses('Folder', 'Utility');
 App::uses('File', 'Utility');
+App::uses('Xml', 'Utility');
 App::uses('HttpSocket', 'Network/Http');
 
 if (!defined('WINDOWS')) {
@@ -19,18 +17,18 @@ if (!defined('WINDOWS')) {
  * Install PHPUnit for the CakePHP 2.x Test-Framework
  * PHPUnit Plugin
  * Place it in your app/Plugin/ directory and open a shell inside your app folder
- * 
+ *
  * - supports windows, linux, mac
  * - select Vendor path dynamically
  * - select PHPUnit version dynamically
  * - get package info and a list of supported versions
  * - does NOT require pear package to be installed
- * 
+ *
  * TODO'S:
  * - params (windows, override, ...)
  * - tests on more OS's
  * - update functionality for PHPUnit
- * 
+ *
  * @original Stef van den Ham
  * @modified Mark Scherer
  * @license MIT License (http://www.opensource.org/licenses/mit-license.php)
@@ -45,8 +43,9 @@ if (!defined('WINDOWS')) {
  * - Added Path select dynamically
  * 2012-07-21
  * - non-pear-fallback for info() and minor improvements, test case added
+ * 2012-09-21 ms
+ * - Upgraded to 3.7.8 and Cake2.3
  */
-
 class PhpunitShell extends AppShell {
 
 	const PHPUNIT_VERSION = '3.7.8';
@@ -55,7 +54,7 @@ class PhpunitShell extends AppShell {
 		$this->out(__('Hi There. To install PHPUnit, run `Phpunit.Phpunit install [version]`'));
 		$this->out('Possible versions:');
 		$this->versions();
-		
+
 		$this->out();
 		$this->out(__('Additional info via'));
 		$this->out(__('- packages [version] (pear packages including version numbers)'));
@@ -64,9 +63,9 @@ class PhpunitShell extends AppShell {
 
 	/**
 	 * list all supported versions
-	 * 
+	 *
 	 * 2011-11-29 ms
-	 */		
+	 */
 	public function versions() {
 		$c = 0;
 		foreach ($this->versions as $key => $version) {
@@ -83,9 +82,9 @@ class PhpunitShell extends AppShell {
 	 * list all packages to a specific version
 	 * you can pass the version yuo want to see (3.5, 3.6, ...) as first param:
 	 * "... packages 3.5" for example
-	 * 
+	 *
 	 * 2011-11-29 ms
-	 */	
+	 */
 	public function packages() {
 		if (empty($this->args[0])) {
 			$this->out(__('Please provide a version like so:'));
@@ -95,7 +94,7 @@ class PhpunitShell extends AppShell {
 			return;
 		}
 		$packages = $this->_getDependencies($this->args[0]);
-		
+
 		foreach ($packages as $package) {
 			$this->out($package['name'].' ['.$package['folder'].']');
 		}
@@ -105,54 +104,59 @@ class PhpunitShell extends AppShell {
 	 * main installer
 	 * you can pass the version yuo want to install (3.5, 3.6, ...) as first param:
 	 * "... install 3.5" for example
-	 * 
+	 *
 	 * 2011-11-29 ms
 	 */
 	public function install() {
 		$v = $this->_getVersion(isset($this->args[0]) ? $this->args[0] : null);
-		
+
 		$this->out(__('Installing PHPUnit %s ...', $v));
-		
+
 		$Http = new HttpSocket();
-		
+
 		$path = $this->_getPath();
 		$tmpPath = $path . '_TMP' . DS;
-		
+
 		# Create the _TMP folder to put the files
-		$Folder = new FolderExt($tmpPath, true);
+		$Folder = new Folder($tmpPath, true);
 		$Folder->create($tmpPath . '_target');
-		
+
 		# Download all files to a temporary location
 		$files = $this->_getDependencies($v);
-		
-		foreach($files as $file) {
+
+		foreach ($files as $file) {
 			if (!file_exists($tmpPath . $file['file']) || !empty($this->params['override'])) {
 				# Download the file
 				$this->out(__('Downloading <info>%s</info> .. ', $file['name']), 0);
+
 				$data = $Http->get($file['url']);
-				
+				if (!$data->body) {
+					throw new RuntimeException('Could not download file. Aborting!');
+				}
+				$Http->reset();
 				# Write it to the tmp folder
 				$NewFile = new File($tmpPath . $file['file'], true);
-				if (!$NewFile->write($data)) {
+				if (!$NewFile->write($data->body)) {
 					$this->error(__('Writing failed'), __('Cannot create tmp files. Aborting.'));
 				}
 				$NewFile->close();
-				$this->out(__('done.'));
+
+				$this->out(__('Download finished.'));
 			}
-			
-			
+
 			# Extract the file to the folders
 			$this->out(__('Extracting ..'), 0);
 			$this->_extract($tmpPath . $file['file']);
-			$this->out('done.');
-			
+
+			$this->out('Extracting done.');
+
 			# Copy the contents to the target folder
-			# Uses the bugfix from my ticket (otherwise you end up with missing folders!!!)
-			# http://cakephp.lighthouseapp.com/projects/42648-cakephp/tickets/2314-folder-class-should-merge-by-default
 			$this->out(__('Adding to Vendors ..'), 0);
-			$Folder->move(array('to'=>$tmpPath . '_target'.DS.$file['folder'].DS, 'from'=>$tmpPath.(str_replace('.tgz', '', $file['file'])).DS.$file['folder'].DS));
-			$this->out('done.');
-			
+			if (!$Folder->move(array('to'=>$tmpPath . '_target'.DS.$file['folder'].DS, 'from'=>$tmpPath.(str_replace('.tgz', '', $file['file'])).DS.$file['folder'].DS))) {
+				$this->err($Folder->errors());
+			}
+			$this->out('Adding done.');
+
 			$this->hr();
 		}
 
@@ -160,28 +164,28 @@ class PhpunitShell extends AppShell {
 		$this->hr();
 
 		$Folder->move(array('to'=>$path, 'from'=>$tmpPath.'_target'.DS, 'merge'=>true));
-		
+
 		# Clean up
 		$Folder->delete($path . '_TMP'.DS);
 
 		$this->out();
 		$this->out(__('<info>PHPUnit %s</info> <warning>has been successfully installed to your Vendor folder!</warning>', $this->versions[$v]));
 	}
-	
+
 	/**
 	 * get a list of the current versions of all used pear packages via phpunit channel
 	 * needs pear package to be installed
 	 * you can easily check that typing `pear` in CLI.
-	 * 
+	 *
 	 * It will also display if there is an update to one of our head packages.
-	 * 
+	 *
 	 * You can manually update those version numbers in the $files array below to get those new versions.
-	 * Or you can issue a ticket or a pull request for this plugin at github for us to update it. 
-	 * 
+	 * Or you can issue a ticket or a pull request for this plugin at github for us to update it.
+	 *
 	 * possible params:
 	 * -v: verbose output (display the description for each package, as well)
-	 * 
-	 * 2012-02-26 ms 
+	 *
+	 * 2012-02-26 ms
 	 */
 	public function info() {
 		if (WINDOWS) {
@@ -196,25 +200,24 @@ class PhpunitShell extends AppShell {
 
 		# our list of packages
 		$packages = $this->_getDependencies();
-		
+
 		# lets match them
 		$result = array();
-		
+
 		foreach ($packages as $package) {
 			list($identifier, $version) = explode('-', $package['file'], 2);
 			$version = substr($version, 0, strrpos($version, '.'));
-			
-	
+
 			if (!isset($officialList[$identifier])) {
 				$this->error(__('Missing package').': '.$identifier);
 			}
 			$pearPackage = $officialList[$identifier];
 			unset($officialList[$identifier]);
-			
+
 			$package['description'] = $pearPackage[2];
 			$package['head'] = $pearPackage[1];
 			$package['current'] = $version;
-			
+
 			$result[] = $package;
 		}
 
@@ -230,7 +233,7 @@ class PhpunitShell extends AppShell {
 				$this->out($this->wrapText($row['description'], array('indent'=>"\t")));
 			}
 		}
-		
+
 		$this->hr();
 		$this->out(__('Unused pear packages') . ':');
 		foreach ($officialList as $key => $val) {
@@ -239,12 +242,12 @@ class PhpunitShell extends AppShell {
 				$this->out($this->wrapText($val[2], array('indent'=>"\t")));
 			}
 		}
-		
+
 	}
-	
+
 	/**
 	 * @return array
-	 */	
+	 */
 	protected function _pear_info() {
 		exec('pear list-channels', $output, $ret);
 		if ($ret !== 0) {
@@ -265,9 +268,9 @@ class PhpunitShell extends AppShell {
 			$phpunitChannel = true;
 		}
 		*/
-		
+
 		exec('pear list-all -c phpunit', $output, $ret);
-		
+
 		# pear list of current packages
 		$res = array();
 		foreach ($output as $row) {
@@ -285,16 +288,15 @@ class PhpunitShell extends AppShell {
 				$name = substr($tmp[0], strrpos($tmp[0], '/')+1);
 			}
 			$res[$name] = $tmp;
-			
+
 		}
 		return $res;
 	}
-	
+
 	/**
 	 * @return array
 	 */
 	protected function _pear_info_xml() {
-		App::uses('Xml', 'Utility');
 		$Xml = Xml::build('http://pear.phpunit.de/feed.xml');
 		$packages = Xml::toArray($Xml);
 		if (empty($packages['feed']['entry'])) {
@@ -323,7 +325,7 @@ class PhpunitShell extends AppShell {
 		}
 		return $res;
 	}
-	
+
 
 	protected function _getVersion($v, $detailed = false) {
 		if (strlen($v) > 3) {
@@ -338,25 +340,25 @@ class PhpunitShell extends AppShell {
 		}
 		return $v;
 	}
-	
+
 	protected function _extract($file) {
 		chdir(dirname($file));
-	
+
 		if (WINDOWS && empty($this->params['os']) || !empty($this->params['os']) && $this->params['os'] == 'w') {
-			$exePath = App::pluginPath('Phpunit').'Vendor'.DS.'exe'.DS;
+			$exePath = App::pluginPath('Phpunit') . 'Vendor' . DS . 'exe' . DS;
 			exec($exePath.'gzip -dr '.$file);
 			$tarFile = str_replace('.tgz', '.tar', $file);
-			exec($exePath.'tar -xvf '.$tarFile);
+			exec($exePath . 'tar -xvf ' . $tarFile);
 		} else {
-			exec('tar -xzf '.$file);
+			exec('tar -xzf ' . $file);
 		}
 	}
-	
+
 	protected function _getPath() {
 		$paths = App::path('Vendor');
 		$pathNames = $paths;
-		
-		$list = array(); 
+
+		$list = array();
 		$i = 0;
 		foreach ($paths as $path) {
 			$i++;
@@ -364,11 +366,11 @@ class PhpunitShell extends AppShell {
 		}
 		$this->out($list);
 
-		$res = $this->in('Select VENDOR path to install into', am(array('q'), array_keys($list)), 'q');
+		$res = $this->in('Select VENDOR path to install into', array_merge(array('q'), array_keys($list)), 'q');
 		if ($res == 'q') {
 			return $this->_stop();
 		}
-		
+
 		$path = $paths[$res-1];
 		return $path;
 	}
@@ -387,15 +389,15 @@ class PhpunitShell extends AppShell {
 				$files[$key]['name'] = str_replace(array('_', '-'), ' ', basename($files[$key]['file'], '.tgz'));
 			}
 		}
-		return $files; 
+		return $files;
 	}
-	
+
 	protected $versions = array(
 		'3.7' => '3.7.8',
 		'3.6' => '3.6.11',
 		'3.5' => '3.5.15',
 	);
-	
+
 	protected $files = array(
 			'3.7' => array(
 				array(
@@ -441,7 +443,7 @@ class PhpunitShell extends AppShell {
 				array(
 					'url' => 'http://pear.phpunit.de/get/PHPUnit_TicketListener_GitHub-1.0.0.tgz',
 					'folder' => 'PHPUnit'
-				),		
+				),
 			),
 			'3.6' => array(
 				array(
@@ -487,7 +489,7 @@ class PhpunitShell extends AppShell {
 				array(
 					'url' => 'http://pear.phpunit.de/get/PHPUnit_TicketListener_GitHub-1.0.0.tgz',
 					'folder' => 'PHPUnit'
-				),		
+				),
 			),
 			'3.5' => array(
 				array(

@@ -15,9 +15,7 @@ Because I'm a fan of self-contained systems. Sure, installing PHPUnit through PE
 
 ## Install the Plugin
 
-Install this plugin to your `app/Plugin` folder by cloning it to a folder called "PHPUnit":
-
-	git clone git://github.com/Hyra/PHPUnit-Cake2.git app/Plugin/PHPUnit
+Install this plugin to your `app/Plugin` folder by cloning it to a folder called "Phpunit"
 
 Make sure you got either `CakePlugin::loadAll()` - or specifically `CakePlugin::load('Phpunit')` in your bootstrap!
 Otherwise the plugin will not be available.
@@ -26,7 +24,7 @@ Otherwise the plugin will not be available.
 
 To install PHPUnit to your CakePHP 2.x install you can use the Shell.
 
-Run `cake PHPUnit.phpunit install` directly from your console.
+Run `cake Phpunit.Phpunit install` directly from your console.
 This will download and extract all the necessary files, and put them in your specified `Vendor` folder.
 
 You can now use PHPUnit through the CLI or your favourite browser. Try it by running:
@@ -37,12 +35,12 @@ If all went well you will see the PHPUnit run the CakePHP basic tests.
 
 It works with Mac OSX, Linux and Windows. Please report any problems.
 
-## Autoload (optional when things are quirky)
+## Autoload
 
 If you have it installed in your ROOT vendors and get some include warnings while baking put this at the top of the VENDORS/PHPUnit/Autoload.php file:
 
     set_include_path(get_include_path().PATH_SEPARATOR.dirname(dirname(__FILE__)));
-    
+
 This way the vendors folder itself is also an include path and those warnings will go away.
 
 ## Checking for updates
