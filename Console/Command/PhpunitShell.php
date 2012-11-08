@@ -444,6 +444,10 @@ class PhpunitShell extends AppShell {
 					'url' => 'http://pear.phpunit.de/get/PHPUnit_TicketListener_GitHub-1.0.0.tgz',
 					'folder' => 'PHPUnit'
 				),
+				array(
+					'url' => 'http://pear.symfony.com/get/Yaml-2.1.3.tgz',
+					'folder' => 'Symfony'
+				),
 			),
 			'3.6' => array(
 				array(
