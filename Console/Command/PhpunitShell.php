@@ -188,15 +188,7 @@ class PhpunitShell extends AppShell {
 	 * 2012-02-26 ms
 	 */
 	public function info() {
-		if (WINDOWS) {
-			$officialList = $this->_pear_info_xml();
-		} else {
-			try {
-				$officialList = $this->_pear_info();
-			} catch (Exception $e) {
-				$officialList = $this->_pear_info_xml();
-			}
-		}
+		$officialList = $this->_pearInfo();
 
 		# our list of packages
 		$packages = $this->_getDependencies();
@@ -245,10 +237,25 @@ class PhpunitShell extends AppShell {
 
 	}
 
+	protected function _pearInfo() {
+		if (WINDOWS) {
+			$officialList = $this->_pearInfoXml();
+		} else {
+			try {
+				$officialList = $this->_pearInfoConsole();
+			} catch (Exception $e) {
+				$officialList = $this->_pearInfoXml();
+			}
+		}
+		$officialYamlList = $this->_pearInfoXml('http://pear.symfony.com/feed.xml');
+		$officialList['Yaml'] = $officialYamlList['Yaml'];
+		return $officialList;
+	}
+
 	/**
 	 * @return array
 	 */
-	protected function _pear_info() {
+	protected function _pearInfoConsole() {
 		exec('pear list-channels', $output, $ret);
 		if ($ret !== 0) {
 			throw new CakeException(__('Pear package not available. Please install using `apt-get install php-pear`'));
@@ -296,8 +303,11 @@ class PhpunitShell extends AppShell {
 	/**
 	 * @return array
 	 */
-	protected function _pear_info_xml() {
-		$Xml = Xml::build('http://pear.phpunit.de/feed.xml');
+	protected function _pearInfoXml($feed = null) {
+		if ($feed === null) {
+			$feed = 'http://pear.phpunit.de/feed.xml';
+		}
+		$Xml = Xml::build($feed);
 		$packages = Xml::toArray($Xml);
 		if (empty($packages['feed']['entry'])) {
 			throw new CakeException('Could not read xml feed');
@@ -426,6 +436,10 @@ class PhpunitShell extends AppShell {
 				),
 				array(
 					'url' => 'http://pear.phpunit.de/get/PHP_TokenStream-1.1.5.tgz',
+					'folder' => 'PHP'
+				),
+				array(
+					'url' => 'http://pear.phpunit.de/get/PHP_Invoker-1.1.2.tgz',
 					'folder' => 'PHP'
 				),
 				array(
