@@ -401,43 +401,43 @@ class PhpunitShell extends AppShell {
 	protected $files = array(
 			'3.7' => array(
 				array(
-					'url' => 'http://pear.phpunit.de/get/PHPUnit-3.7.8.tgz',
+					'url' => 'http://pear.phpunit.de/get/PHPUnit-3.7.9.tgz',
 					'folder' => 'PHPUnit'
 				),
 				array(
-					'url' => 'http://pear.phpunit.de/get/File_Iterator-1.3.1.tgz',
+					'url' => 'http://pear.phpunit.de/get/File_Iterator-1.3.3.tgz',
 					'folder' => 'File'
 				),
 				array(
-					'url' => 'http://pear.phpunit.de/get/Text_Template-1.1.1.tgz',
+					'url' => 'http://pear.phpunit.de/get/Text_Template-1.1.4.tgz',
 					'folder' => 'Text'
 				),
 				array(
-					'url' => 'http://pear.phpunit.de/get/PHP_CodeCoverage-1.1.3.tgz',
+					'url' => 'http://pear.phpunit.de/get/PHP_CodeCoverage-1.2.6.tgz',
 					'folder' => 'PHP'
 				),
 				array(
-					'url' => 'http://pear.phpunit.de/get/PHP_Timer-1.0.2.tgz',
+					'url' => 'http://pear.phpunit.de/get/PHP_Timer-1.0.4.tgz',
 					'folder' => 'PHP'
 				),
 				array(
-					'url' => 'http://pear.phpunit.de/get/PHPUnit_MockObject-1.1.1.tgz',
+					'url' => 'http://pear.phpunit.de/get/PHPUnit_MockObject-1.2.2.tgz',
 					'folder' => 'PHPUnit'
 				),
 				array(
-					'url' => 'http://pear.phpunit.de/get/PHP_TokenStream-1.1.3.tgz',
+					'url' => 'http://pear.phpunit.de/get/PHP_TokenStream-1.1.5.tgz',
 					'folder' => 'PHP'
 				),
 				array(
-					'url' => 'http://pear.phpunit.de/get/DbUnit-1.1.2.tgz',
+					'url' => 'http://pear.phpunit.de/get/DbUnit-1.2.1.tgz',
 					'folder' => 'PHPUnit'
 				),
 				array(
-					'url' => 'http://pear.phpunit.de/get/PHPUnit_Story-1.0.0.tgz',
+					'url' => 'http://pear.phpunit.de/get/PHPUnit_Story-1.0.1.tgz',
 					'folder' => 'PHPUnit'
 				),
 				array(
-					'url' => 'http://pear.phpunit.de/get/PHPUnit_Selenium-1.2.7.tgz',
+					'url' => 'http://pear.phpunit.de/get/PHPUnit_Selenium-1.2.10.tgz',
 					'folder' => 'PHPUnit'
 				),
 				array(

@@ -11,6 +11,10 @@ This "installer" prepares all the dependencies needed to use PHPUnit with CakePH
 
 Because I'm a fan of self-contained systems. Sure, installing PHPUnit through PEAR systemwide is supposed to be "easy", but when you're working on multiple workstations and deploy to different hosting setups its just nice to know you have everything within reach.
 
+## Requirements
+
+PHP5.3 and CakePHP2.x (>= 2.3)
+
 ## Install the Plugin
 
 Install this plugin to your `app/Plugin` folder by cloning it to a folder called "Phpunit"
