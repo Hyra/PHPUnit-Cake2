@@ -1,9 +1,7 @@
 ## Update 2012-11-07
 
 PHPUnit Installer now supports
-3.7 (currently 3.7.8)
-3.6
-and 3.5
+3.7 (currently 3.7.8), 3.6 and 3.5
 
 ## What?
 
@@ -39,7 +37,7 @@ It works with Mac OSX, Linux and Windows. Please report any problems.
 
 If you have it installed in your ROOT vendors and get some include warnings while baking put this at the top of the VENDORS/PHPUnit/Autoload.php file:
 
-    set_include_path(get_include_path().PATH_SEPARATOR.dirname(dirname(__FILE__)));
+    set_include_path(get_include_path() . PATH_SEPARATOR . dirname(dirname(__FILE__)));
 
 This way the vendors folder itself is also an include path and those warnings will go away.
 
