@@ -39,11 +39,14 @@ It works with Mac OSX, Linux and Windows. Please report any problems.
 
 ## Autoload
 
-If you have it installed in your ROOT vendors and get some include warnings while baking put this at the top of the VENDORS/PHPUnit/Autoload.php file:
+If you have it installed in your ROOT vendors and get (fatal) errors while baking put this at the top of the VENDORS/PHPUnit/Autoload.php file:
 
-    set_include_path(get_include_path() . PATH_SEPARATOR . dirname(dirname(__FILE__)));
+    if (strpos(get_include_path(), dirname(dirname(__FILE__))) === false) {
+        set_include_path(get_include_path() . PATH_SEPARATOR . dirname(dirname(__FILE__)));
+    }
 
-This way the vendors folder itself is also an include path and those warnings will go away.
+This way the vendors folder itself is also an include path and those errors will go away.
+The PHPUnit files are checked/included prior to baking unit tests. So if you did not already set the path in your system, you need to do it this way.
 
 ## Checking for updates
 
