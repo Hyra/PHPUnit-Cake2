@@ -45,10 +45,10 @@ if (!defined('WINDOWS')) {
  * - non-pear-fallback for info() and minor improvements, test case added
  * 2012-09-21 ms
  * - Upgraded to 3.7.9 and Cake2.3
+ * 2013-02-28 ms
+ * - Upgraded to 3.7.14
  */
 class PhpunitShell extends AppShell {
-
-	const PHPUNIT_VERSION = '3.7.9';
 
 	public function main() {
 		$this->out(__('Hi There. To install PHPUnit, run `Phpunit.Phpunit install [version]`'));
@@ -403,7 +403,7 @@ class PhpunitShell extends AppShell {
 	}
 
 	protected $versions = array(
-		'3.7' => '3.7.9',
+		'3.7' => '3.7.14',
 		'3.6' => '3.6.11',
 		'3.5' => '3.5.15',
 	);
@@ -411,7 +411,7 @@ class PhpunitShell extends AppShell {
 	protected $files = array(
 			'3.7' => array(
 				array(
-					'url' => 'http://pear.phpunit.de/get/PHPUnit-3.7.9.tgz',
+					'url' => 'http://pear.phpunit.de/get/PHPUnit-3.7.14.tgz',
 					'folder' => 'PHPUnit'
 				),
 				array(
@@ -423,7 +423,7 @@ class PhpunitShell extends AppShell {
 					'folder' => 'Text'
 				),
 				array(
-					'url' => 'http://pear.phpunit.de/get/PHP_CodeCoverage-1.2.6.tgz',
+					'url' => 'http://pear.phpunit.de/get/PHP_CodeCoverage-1.2.9.tgz',
 					'folder' => 'PHP'
 				),
 				array(
@@ -431,7 +431,7 @@ class PhpunitShell extends AppShell {
 					'folder' => 'PHP'
 				),
 				array(
-					'url' => 'http://pear.phpunit.de/get/PHPUnit_MockObject-1.2.2.tgz',
+					'url' => 'http://pear.phpunit.de/get/PHPUnit_MockObject-1.2.3.tgz',
 					'folder' => 'PHPUnit'
 				),
 				array(
@@ -443,7 +443,7 @@ class PhpunitShell extends AppShell {
 					'folder' => 'PHP'
 				),
 				array(
-					'url' => 'http://pear.phpunit.de/get/DbUnit-1.2.1.tgz',
+					'url' => 'http://pear.phpunit.de/get/DbUnit-1.2.2.tgz',
 					'folder' => 'PHPUnit'
 				),
 				array(
@@ -451,7 +451,7 @@ class PhpunitShell extends AppShell {
 					'folder' => 'PHPUnit'
 				),
 				array(
-					'url' => 'http://pear.phpunit.de/get/PHPUnit_Selenium-1.2.10.tgz',
+					'url' => 'http://pear.phpunit.de/get/PHPUnit_Selenium-1.2.12.tgz',
 					'folder' => 'PHPUnit'
 				),
 				array(
@@ -459,7 +459,7 @@ class PhpunitShell extends AppShell {
 					'folder' => 'PHPUnit'
 				),
 				array(
-					'url' => 'http://pear.symfony.com/get/Yaml-2.1.3.tgz',
+					'url' => 'http://pear.symfony.com/get/Yaml-2.1.8.tgz',
 					'folder' => 'Symfony'
 				),
 			),

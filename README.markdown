@@ -1,7 +1,7 @@
 ## Update 2012-11-07
 
 PHPUnit Installer now supports
-3.7 (currently 3.7.9), 3.6 and 3.5
+3.7 (currently 3.7.14), 3.6 and 3.5
 
 ## What?
 
