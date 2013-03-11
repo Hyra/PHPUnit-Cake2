@@ -1,9 +1,7 @@
 ## Update 2012-11-07
 
 PHPUnit Installer now supports
-3.7 (currently 3.7.8)
-3.6
-and 3.5
+3.7 (currently 3.7.14), 3.6 and 3.5
 
 ## What?
 
@@ -12,6 +10,10 @@ This "installer" prepares all the dependencies needed to use PHPUnit with CakePH
 ## Why?
 
 Because I'm a fan of self-contained systems. Sure, installing PHPUnit through PEAR systemwide is supposed to be "easy", but when you're working on multiple workstations and deploy to different hosting setups its just nice to know you have everything within reach.
+
+## Requirements
+
+PHP5.3 and CakePHP2.x (>= 2.3)
 
 ## Install the Plugin
 
@@ -37,11 +39,14 @@ It works with Mac OSX, Linux and Windows. Please report any problems.
 
 ## Autoload
 
-If you have it installed in your ROOT vendors and get some include warnings while baking put this at the top of the VENDORS/PHPUnit/Autoload.php file:
+If you have it installed in your ROOT vendors and get (fatal) errors while baking put this at the top of the VENDORS/PHPUnit/Autoload.php file:
 
-    set_include_path(get_include_path().PATH_SEPARATOR.dirname(dirname(__FILE__)));
+    if (strpos(get_include_path(), dirname(dirname(__FILE__))) === false) {
+        set_include_path(get_include_path() . PATH_SEPARATOR . dirname(dirname(__FILE__)));
+    }
 
-This way the vendors folder itself is also an include path and those warnings will go away.
+This way the vendors folder itself is also an include path and those errors will go away.
+The PHPUnit files are checked/included prior to baking unit tests. So if you did not already set the path in your system, you need to do it this way.
 
 ## Checking for updates
 

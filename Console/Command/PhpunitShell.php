@@ -44,11 +44,11 @@ if (!defined('WINDOWS')) {
  * 2012-07-21
  * - non-pear-fallback for info() and minor improvements, test case added
  * 2012-09-21 ms
- * - Upgraded to 3.7.8 and Cake2.3
+ * - Upgraded to 3.7.9 and Cake2.3
+ * 2013-02-28 ms
+ * - Upgraded to 3.7.14
  */
 class PhpunitShell extends AppShell {
-
-	const PHPUNIT_VERSION = '3.7.8';
 
 	public function main() {
 		$this->out(__('Hi There. To install PHPUnit, run `Phpunit.Phpunit install [version]`'));
@@ -188,15 +188,7 @@ class PhpunitShell extends AppShell {
 	 * 2012-02-26 ms
 	 */
 	public function info() {
-		if (WINDOWS) {
-			$officialList = $this->_pear_info_xml();
-		} else {
-			try {
-				$officialList = $this->_pear_info();
-			} catch (Exception $e) {
-				$officialList = $this->_pear_info_xml();
-			}
-		}
+		$officialList = $this->_pearInfo();
 
 		# our list of packages
 		$packages = $this->_getDependencies();
@@ -245,10 +237,25 @@ class PhpunitShell extends AppShell {
 
 	}
 
+	protected function _pearInfo() {
+		if (WINDOWS) {
+			$officialList = $this->_pearInfoXml();
+		} else {
+			try {
+				$officialList = $this->_pearInfoConsole();
+			} catch (Exception $e) {
+				$officialList = $this->_pearInfoXml();
+			}
+		}
+		$officialYamlList = $this->_pearInfoXml('http://pear.symfony.com/feed.xml');
+		$officialList['Yaml'] = $officialYamlList['Yaml'];
+		return $officialList;
+	}
+
 	/**
 	 * @return array
 	 */
-	protected function _pear_info() {
+	protected function _pearInfoConsole() {
 		exec('pear list-channels', $output, $ret);
 		if ($ret !== 0) {
 			throw new CakeException(__('Pear package not available. Please install using `apt-get install php-pear`'));
@@ -296,8 +303,11 @@ class PhpunitShell extends AppShell {
 	/**
 	 * @return array
 	 */
-	protected function _pear_info_xml() {
-		$Xml = Xml::build('http://pear.phpunit.de/feed.xml');
+	protected function _pearInfoXml($feed = null) {
+		if ($feed === null) {
+			$feed = 'http://pear.phpunit.de/feed.xml';
+		}
+		$Xml = Xml::build($feed);
 		$packages = Xml::toArray($Xml);
 		if (empty($packages['feed']['entry'])) {
 			throw new CakeException('Could not read xml feed');
@@ -393,7 +403,7 @@ class PhpunitShell extends AppShell {
 	}
 
 	protected $versions = array(
-		'3.7' => '3.7.8',
+		'3.7' => '3.7.14',
 		'3.6' => '3.6.11',
 		'3.5' => '3.5.15',
 	);
@@ -401,48 +411,56 @@ class PhpunitShell extends AppShell {
 	protected $files = array(
 			'3.7' => array(
 				array(
-					'url' => 'http://pear.phpunit.de/get/PHPUnit-3.7.8.tgz',
+					'url' => 'http://pear.phpunit.de/get/PHPUnit-3.7.14.tgz',
 					'folder' => 'PHPUnit'
 				),
 				array(
-					'url' => 'http://pear.phpunit.de/get/File_Iterator-1.3.1.tgz',
+					'url' => 'http://pear.phpunit.de/get/File_Iterator-1.3.3.tgz',
 					'folder' => 'File'
 				),
 				array(
-					'url' => 'http://pear.phpunit.de/get/Text_Template-1.1.1.tgz',
+					'url' => 'http://pear.phpunit.de/get/Text_Template-1.1.4.tgz',
 					'folder' => 'Text'
 				),
 				array(
-					'url' => 'http://pear.phpunit.de/get/PHP_CodeCoverage-1.1.3.tgz',
+					'url' => 'http://pear.phpunit.de/get/PHP_CodeCoverage-1.2.9.tgz',
 					'folder' => 'PHP'
 				),
 				array(
-					'url' => 'http://pear.phpunit.de/get/PHP_Timer-1.0.2.tgz',
+					'url' => 'http://pear.phpunit.de/get/PHP_Timer-1.0.4.tgz',
 					'folder' => 'PHP'
 				),
 				array(
-					'url' => 'http://pear.phpunit.de/get/PHPUnit_MockObject-1.1.1.tgz',
+					'url' => 'http://pear.phpunit.de/get/PHPUnit_MockObject-1.2.3.tgz',
 					'folder' => 'PHPUnit'
 				),
 				array(
-					'url' => 'http://pear.phpunit.de/get/PHP_TokenStream-1.1.3.tgz',
+					'url' => 'http://pear.phpunit.de/get/PHP_TokenStream-1.1.5.tgz',
 					'folder' => 'PHP'
 				),
 				array(
-					'url' => 'http://pear.phpunit.de/get/DbUnit-1.1.2.tgz',
+					'url' => 'http://pear.phpunit.de/get/PHP_Invoker-1.1.2.tgz',
+					'folder' => 'PHP'
+				),
+				array(
+					'url' => 'http://pear.phpunit.de/get/DbUnit-1.2.2.tgz',
 					'folder' => 'PHPUnit'
 				),
 				array(
-					'url' => 'http://pear.phpunit.de/get/PHPUnit_Story-1.0.0.tgz',
+					'url' => 'http://pear.phpunit.de/get/PHPUnit_Story-1.0.1.tgz',
 					'folder' => 'PHPUnit'
 				),
 				array(
-					'url' => 'http://pear.phpunit.de/get/PHPUnit_Selenium-1.2.7.tgz',
+					'url' => 'http://pear.phpunit.de/get/PHPUnit_Selenium-1.2.12.tgz',
 					'folder' => 'PHPUnit'
 				),
 				array(
 					'url' => 'http://pear.phpunit.de/get/PHPUnit_TicketListener_GitHub-1.0.0.tgz',
 					'folder' => 'PHPUnit'
+				),
+				array(
+					'url' => 'http://pear.symfony.com/get/Yaml-2.1.8.tgz',
+					'folder' => 'Symfony'
 				),
 			),
 			'3.6' => array(
