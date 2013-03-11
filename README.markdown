@@ -1,6 +1,6 @@
-## Update 2012-11-07
+## PHPUnit installer as CakePHP standalone plugin
 
-PHPUnit Installer now supports
+PHPUnit installer now supports
 3.7 (currently 3.7.14), 3.6 and 3.5
 
 ## What?
