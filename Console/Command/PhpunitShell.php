@@ -45,8 +45,8 @@ if (!defined('WINDOWS')) {
  * - non-pear-fallback for info() and minor improvements, test case added
  * 2012-09-21 ms
  * - Upgraded to 3.7.9 and Cake2.3
- * 2013-02-28 ms
- * - Upgraded to 3.7.14
+ * 2013-04-16 ms
+ * - Upgraded to 3.7.19
  */
 class PhpunitShell extends AppShell {
 
@@ -403,7 +403,7 @@ class PhpunitShell extends AppShell {
 	}
 
 	protected $versions = array(
-		'3.7' => '3.7.14',
+		'3.7' => '3.7.19',
 		'3.6' => '3.6.11',
 		'3.5' => '3.5.15',
 	);
@@ -411,7 +411,7 @@ class PhpunitShell extends AppShell {
 	protected $files = array(
 			'3.7' => array(
 				array(
-					'url' => 'http://pear.phpunit.de/get/PHPUnit-3.7.14.tgz',
+					'url' => 'http://pear.phpunit.de/get/PHPUnit-3.7.19.tgz',
 					'folder' => 'PHPUnit'
 				),
 				array(
@@ -443,11 +443,11 @@ class PhpunitShell extends AppShell {
 					'folder' => 'PHP'
 				),
 				array(
-					'url' => 'http://pear.phpunit.de/get/DbUnit-1.2.2.tgz',
+					'url' => 'http://pear.phpunit.de/get/DbUnit-1.2.3.tgz',
 					'folder' => 'PHPUnit'
 				),
 				array(
-					'url' => 'http://pear.phpunit.de/get/PHPUnit_Story-1.0.1.tgz',
+					'url' => 'http://pear.phpunit.de/get/PHPUnit_Story-1.0.2.tgz',
 					'folder' => 'PHPUnit'
 				),
 				array(
@@ -459,7 +459,7 @@ class PhpunitShell extends AppShell {
 					'folder' => 'PHPUnit'
 				),
 				array(
-					'url' => 'http://pear.symfony.com/get/Yaml-2.1.8.tgz',
+					'url' => 'http://pear.symfony.com/get/Yaml-2.2.1.tgz',
 					'folder' => 'Symfony'
 				),
 			),
