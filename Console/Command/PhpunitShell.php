@@ -27,7 +27,6 @@ if (!defined('WINDOWS')) {
  * TODO'S:
  * - params (windows, override, ...)
  * - tests on more OS's
- * - update functionality for PHPUnit
  *
  * @original Stef van den Ham
  * @modified Mark Scherer
@@ -47,8 +46,12 @@ if (!defined('WINDOWS')) {
  * - Upgraded to 3.7.9 and Cake2.3
  * 2013-04-16 ms
  * - Upgraded to 3.7.19
+ * 2013-06-11 ms
+ * - Automatically install current head
  */
 class PhpunitShell extends AppShell {
+
+	public $officialList = array();
 
 	public function main() {
 		$this->out(__('Hi There. To install PHPUnit, run `Phpunit.Phpunit install [version]`'));
@@ -68,7 +71,8 @@ class PhpunitShell extends AppShell {
 	 */
 	public function versions() {
 		$c = 0;
-		foreach ($this->versions as $key => $version) {
+		$versions = $this->_getVersions();
+		foreach ($versions as $key => $version) {
 			$default = '';
 			if ($c === 0) {
 				$default = "\t".'['.__('default').']';
@@ -93,7 +97,8 @@ class PhpunitShell extends AppShell {
 			$this->versions();
 			return;
 		}
-		$packages = $this->_getDependencies($this->args[0]);
+		$v = $this->_getVersion(isset($this->args[0]) ? $this->args[0] : null);
+		$packages = $this->_getDependencies($v);
 
 		foreach ($packages as $package) {
 			$this->out($package['name'].' ['.$package['folder'].']');
@@ -152,6 +157,7 @@ class PhpunitShell extends AppShell {
 
 			# Copy the contents to the target folder
 			$this->out(__('Adding to Vendors ..'), 0);
+
 			if (!$Folder->move(array('to'=>$tmpPath . '_target'.DS.$file['folder'].DS, 'from'=>$tmpPath.(str_replace('.tgz', '', $file['file'])).DS.$file['folder'].DS))) {
 				$this->err($Folder->errors());
 			}
@@ -169,7 +175,7 @@ class PhpunitShell extends AppShell {
 		$Folder->delete($path . '_TMP'.DS);
 
 		$this->out();
-		$this->out(__('<info>PHPUnit %s</info> <warning>has been successfully installed to your Vendor folder!</warning>', $this->versions[$v]));
+		$this->out(__('<info>PHPUnit %s</info> <warning>has been successfully installed to your Vendor folder!</warning>', $v));
 	}
 
 	/**
@@ -189,6 +195,8 @@ class PhpunitShell extends AppShell {
 	 */
 	public function info() {
 		$officialList = $this->_pearInfo();
+		$phpUnitVersion = $officialList['PHPUnit'][1];
+		$this->out(__('Fetching feed data for newest available PHPUnit version %s', $phpUnitVersion));
 
 		# our list of packages
 		$packages = $this->_getDependencies();
@@ -237,18 +245,48 @@ class PhpunitShell extends AppShell {
 
 	}
 
+	/**
+	 * PhpunitShell::_getVersions()
+	 *
+	 * @return array
+	 */
+	protected function _getVersions() {
+		$officialList = $this->_pearInfo();
+		$phpUnitVersion = $officialList['PHPUnit'][1];
+		$v = $phpUnitVersion;
+		if (strlen($v) > 3) {
+			$v = substr($v, 0, 3);
+		}
+		$versions[$v] = $phpUnitVersion;
+		$versions += $this->versions;
+		return $versions;
+	}
+
+	/**
+	 * PhpunitShell::_pearInfo()
+	 *
+	 * @return
+	 */
 	protected function _pearInfo() {
+		if ($this->officialList) {
+			return $this->officialList;
+		}
 		if (WINDOWS) {
 			$officialList = $this->_pearInfoXml();
 		} else {
+			/*
 			try {
 				$officialList = $this->_pearInfoConsole();
 			} catch (Exception $e) {
 				$officialList = $this->_pearInfoXml();
 			}
+			*/
+			$officialList = $this->_pearInfoXml();
 		}
 		$officialYamlList = $this->_pearInfoXml('http://pear.symfony.com/feed.xml');
 		$officialList['Yaml'] = $officialYamlList['Yaml'];
+
+		$this->officialList = $officialList;
 		return $officialList;
 	}
 
@@ -329,7 +367,9 @@ class PhpunitShell extends AppShell {
 			$p = array(
 				0 => 'phpunit/'.$name,
 				1 => $version,
-				2 => $package['content']
+				2 => $package['content'],
+				3 => $package['link']['@href'],
+				4 => $package['title'],
 			);
 			$res[$name] = $p;
 		}
@@ -338,12 +378,16 @@ class PhpunitShell extends AppShell {
 
 
 	protected function _getVersion($v, $detailed = false) {
+		if (empty($v)) {
+			$officialList = $this->_pearInfo();
+			$v = $officialList['PHPUnit'][1];
+		}
 		if (strlen($v) > 3) {
 			$v = substr($v, 0, 3);
 		}
 		if (empty($v) || !array_key_exists($v, $this->versions)) {
-			$versions = array_keys($this->versions);
-			$v = array_shift($versions);
+			$officialList = $this->_pearInfo();
+			$phpUnitVersion = $officialList['PHPUnit'][1];
 		}
 		if ($detailed) {
 			return $this->versions[$v];
@@ -389,17 +433,71 @@ class PhpunitShell extends AppShell {
 	 * get specific version or the latest if not specified
 	 */
 	protected function _getDependencies($v = null) {
-		$v = $this->_getVersion($v);
-		$files = $this->files[$v];
-		foreach ($files as $key => $value) {
-			if (!isset($value['file'])) {
-				$files[$key]['file'] = basename($value['url']);
+		$officialList = $this->_pearInfo();
+		$newestVersion = $officialList['PHPUnit'][1];
+		if (strlen($newestVersion) > 3) {
+			$newestVersion = substr($newestVersion, 0, 3);
+		}
+		if ($v === null) {
+			$v = $this->_getVersion($v);
+		}
+
+		if ($newestVersion === $v) {
+			$files = array();
+			foreach ($officialList as $key => $officialFile) {
+				$folder = null;
+				if ($officialFile[0] === 'phpunit/Yaml') {
+					$folder = 'Symfony';
+				} elseif (($pos = strpos($name = basename($officialFile[3], '.tgz'), '_')) !== false) {
+					$folder = substr($name, 0, $pos);
+				}
+				if (!$folder) {
+					$folder = 'PHPUnit';
+				}
+				$tmp = array(
+					'url' => $officialFile[3],
+					'folder' => $folder,
+					'name' => $officialFile[4],
+					'file' => basename($officialFile[3])
+				);
+				$files[$key] = $tmp;
 			}
-			if (!isset($value['name'])) {
-				$files[$key]['name'] = str_replace(array('_', '-'), ' ', basename($files[$key]['file'], '.tgz'));
+
+			$localVersions = array_keys($this->versions);
+			$localFiles = $this->_getFileList(array_shift($localVersions));
+			$keys = array_keys($localFiles);
+			foreach ($files as $key => $file) {
+				if (!in_array($key, $keys)) {
+					unset($files[$key]);
+				}
 			}
+
+		} else {
+			$files = $this->_getFileList($v);
 		}
 		return $files;
+	}
+
+	/**
+	 * PhpunitShell::_getFileList()
+	 *
+	 * @param string $v
+	 * @return array
+	 */
+	protected function _getFileList($v) {
+		$files = $this->files[$v];
+		$result = array();
+		foreach ($files as $key => $value) {
+			if (!isset($value['file'])) {
+				$value['file'] = basename($value['url']);
+			}
+			if (!isset($value['name'])) {
+				$value['name'] = str_replace(array('_', '-'), ' ', basename($value['file'], '.tgz'));
+			}
+			$package = substr($value['file'], 0, strpos($value['file'], '-'));
+			$result[$package] = $value;
+		}
+		return $result;
 	}
 
 	protected $versions = array(
