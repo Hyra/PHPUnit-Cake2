@@ -142,7 +142,7 @@ class PhpunitShell extends AppShell {
 				# Write it to the tmp folder
 				$NewFile = new File($tmpPath . $file['file'], true);
 				if (!$NewFile->write($data->body)) {
-					$this->error(__('Writing failed'), __('Cannot create tmp files. Aborting.'));
+					return $this->error(__('Writing failed'), __('Cannot create tmp files. Aborting.'));
 				}
 				$NewFile->close();
 
@@ -209,7 +209,7 @@ class PhpunitShell extends AppShell {
 			$version = substr($version, 0, strrpos($version, '.'));
 
 			if (!isset($officialList[$identifier])) {
-				$this->error(__('Missing package').': '.$identifier);
+				return $this->error(__('Missing package').': '.$identifier);
 			}
 			$pearPackage = $officialList[$identifier];
 			unset($officialList[$identifier]);
