@@ -48,6 +48,8 @@ if (!defined('WINDOWS')) {
  * - Upgraded to 3.7.19
  * 2013-06-11 ms
  * - Automatically install current head
+ * 2013-08-13 ms
+ * - Detect current version
  */
 class PhpunitShell extends AppShell {
 
@@ -58,10 +60,43 @@ class PhpunitShell extends AppShell {
 		$this->out('Possible versions:');
 		$this->versions();
 
+		$this->out('');
+		$this->out('Currently installed:');
+		$phpunitVersion = $this->_currentVersion();
+		$this->out($phpunitVersion);
+
 		$this->out();
 		$this->out(__('Additional info via'));
 		$this->out(__('- packages [version] (pear packages including version numbers)'));
 		$this->out(__('- info [-v] (comparison to current versions on the pear network)'));
+	}
+
+	/**
+	 * PhpunitShell::_currentVersion()
+	 *
+	 * @return string
+	 */
+	protected function _currentVersion() {
+		if (!class_exists('PHPUnit_Framework_TestCase')) {
+			foreach (App::path('vendors') as $vendor) {
+				$vendor = rtrim($vendor, DS);
+				if (is_dir($vendor . DS . 'PHPUnit')) {
+					ini_set('include_path', $vendor . PATH_SEPARATOR . ini_get('include_path'));
+					break;
+				}
+			}
+			@include 'PHPUnit' . DS . 'Autoload.php';
+			class_exists('PHPUnit_Framework_TestCase');
+		}
+
+		$phpunitVersion = null;
+		if (class_exists('PHPUnit_Runner_Version')) {
+			$phpunitVersion = PHPUnit_Runner_Version::id();
+		}
+		if (!$phpunitVersion) {
+			$phpunitVersion = 'n/a';
+		}
+		return $phpunitVersion;
 	}
 
 	/**
