@@ -411,7 +411,6 @@ class PhpunitShell extends AppShell {
 		return $res;
 	}
 
-
 	protected function _getVersion($v, $detailed = false) {
 		if (empty($v)) {
 			$officialList = $this->_pearInfo();
