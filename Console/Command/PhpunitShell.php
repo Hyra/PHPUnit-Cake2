@@ -6,7 +6,7 @@ App::uses('Xml', 'Utility');
 App::uses('HttpSocket', 'Network/Http');
 
 if (!defined('WINDOWS')) {
-	if (DS == '\\' || substr(PHP_OS, 0, 3) == 'WIN') {
+	if (DS === '\\' || substr(PHP_OS, 0, 3) === 'WIN') {
 		define('WINDOWS', true);
 	} else {
 		define('WINDOWS', false);
@@ -55,6 +55,11 @@ class PhpunitShell extends AppShell {
 
 	public $officialList = array();
 
+	/**
+	 * Main help page.
+	 *
+	 * @return void
+	 */
 	public function main() {
 		$this->out(__('Hi There. To install PHPUnit, run `Phpunit.Phpunit install [version]`'));
 		$this->out('Possible versions:');
@@ -100,9 +105,9 @@ class PhpunitShell extends AppShell {
 	}
 
 	/**
-	 * list all supported versions
+	 * List all supported versions.
 	 *
-	 * 2011-11-29 ms
+	 * @return void
 	 */
 	public function versions() {
 		$c = 0;
@@ -118,11 +123,11 @@ class PhpunitShell extends AppShell {
 	}
 
 	/**
-	 * list all packages to a specific version
-	 * you can pass the version yuo want to see (3.5, 3.6, ...) as first param:
+	 * List all packages to a specific version.
+	 * You can pass the version yuo want to see (3.5, 3.6, ...) as first param:
 	 * "... packages 3.5" for example
 	 *
-	 * 2011-11-29 ms
+	 * @return void
 	 */
 	public function packages() {
 		if (empty($this->args[0])) {
@@ -145,7 +150,7 @@ class PhpunitShell extends AppShell {
 	 * you can pass the version yuo want to install (3.5, 3.6, ...) as first param:
 	 * "... install 3.5" for example
 	 *
-	 * 2011-11-29 ms
+	 * @return void
 	 */
 	public function install() {
 		$v = $this->_getVersion(isset($this->args[0]) ? $this->args[0] : null);
@@ -226,7 +231,7 @@ class PhpunitShell extends AppShell {
 	 * possible params:
 	 * -v: verbose output (display the description for each package, as well)
 	 *
-	 * 2012-02-26 ms
+	 * @return void
 	 */
 	public function info() {
 		$officialList = $this->_pearInfo();
@@ -277,7 +282,6 @@ class PhpunitShell extends AppShell {
 				$this->out($this->wrapText($val[2], array('indent'=>"\t")));
 			}
 		}
-
 	}
 
 	/**
@@ -300,7 +304,7 @@ class PhpunitShell extends AppShell {
 	/**
 	 * PhpunitShell::_pearInfo()
 	 *
-	 * @return
+	 * @return array
 	 */
 	protected function _pearInfo() {
 		if ($this->officialList) {
@@ -411,6 +415,13 @@ class PhpunitShell extends AppShell {
 		return $res;
 	}
 
+	/**
+	 * PhpunitShell::_getVersion()
+	 *
+	 * @param string $v
+	 * @param boolean $detailed
+	 * @return string
+	 */
 	protected function _getVersion($v, $detailed = false) {
 		if (empty($v)) {
 			$officialList = $this->_pearInfo();
@@ -429,10 +440,16 @@ class PhpunitShell extends AppShell {
 		return $v;
 	}
 
+	/**
+	 * PhpunitShell::_extract()
+	 *
+	 * @param string $file
+	 * @return void
+	 */
 	protected function _extract($file) {
 		chdir(dirname($file));
 
-		if (WINDOWS && empty($this->params['os']) || !empty($this->params['os']) && $this->params['os'] == 'w') {
+		if (WINDOWS && empty($this->params['os']) || !empty($this->params['os']) && $this->params['os'] === 'w') {
 			$exePath = App::pluginPath('Phpunit') . 'Vendor' . DS . 'exe' . DS;
 			exec($exePath.'gzip -dr '.$file);
 			$tarFile = str_replace('.tgz', '.tar', $file);
@@ -442,6 +459,11 @@ class PhpunitShell extends AppShell {
 		}
 	}
 
+	/**
+	 * PhpunitShell::_getPath()
+	 *
+	 * @return string
+	 */
 	protected function _getPath() {
 		$paths = App::path('Vendor');
 		$pathNames = $paths;
@@ -455,7 +477,7 @@ class PhpunitShell extends AppShell {
 		$this->out($list);
 
 		$res = $this->in('Select VENDOR path to install into', array_merge(array('q'), array_keys($list)), 'q');
-		if ($res == 'q') {
+		if ($res === 'q') {
 			return $this->_stop();
 		}
 
@@ -464,7 +486,9 @@ class PhpunitShell extends AppShell {
 	}
 
 	/**
-	 * get specific version or the latest if not specified
+	 * Get specific version or the latest if not specified.
+	 *
+	 * @return array
 	 */
 	protected function _getDependencies($v = null) {
 		$officialList = $this->_pearInfo();

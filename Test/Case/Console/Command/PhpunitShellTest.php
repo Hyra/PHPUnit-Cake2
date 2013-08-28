@@ -60,11 +60,11 @@ class TestPhpunitShell extends PhpunitShell {
 	}
 
 	/*
-	public function error($message = null,$newlines = 1) {
+	public function error($message = null, $newlines = 1) {
 		echo $message.PHP_EOL;
 	}
 
-	public function err($message = null,$newlines = 1) {
+	public function err($message = null, $newlines = 1) {
 		echo $message.PHP_EOL;
 	}
 	*/
