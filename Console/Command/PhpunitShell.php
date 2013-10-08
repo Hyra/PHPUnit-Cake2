@@ -146,7 +146,7 @@ class PhpunitShell extends AppShell {
 	}
 
 	/**
-	 * main installer
+	 * Main installer
 	 * you can pass the version yuo want to install (3.5, 3.6, ...) as first param:
 	 * "... install 3.5" for example
 	 *
@@ -219,7 +219,7 @@ class PhpunitShell extends AppShell {
 	}
 
 	/**
-	 * get a list of the current versions of all used pear packages via phpunit channel
+	 * Get a list of the current versions of all used pear packages via phpunit channel
 	 * needs pear package to be installed
 	 * you can easily check that typing `pear` in CLI.
 	 *

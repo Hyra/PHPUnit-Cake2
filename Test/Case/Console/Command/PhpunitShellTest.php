@@ -51,7 +51,7 @@ class PhpunitShellTest extends CakeTestCase {
 }
 
 /**
- * helper to directly display console output
+ * Helper to directly display console output
  */
 class TestPhpunitShell extends PhpunitShell {
 
