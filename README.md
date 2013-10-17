@@ -42,7 +42,15 @@ You can now use PHPUnit through the CLI or your favourite browser. Try it by run
 
 If all went well you will see the PHPUnit run the CakePHP basic tests.
 
+To run the Tools plugin tests, for example, use:
+
+	cake testsuite Tools AllTools
+
 It works with Mac OSX, Linux and Windows. Please report any problems.
+
+You can also use the browser testsuite:
+
+	http://domain.local/test.php
 
 ## Autoload
 
