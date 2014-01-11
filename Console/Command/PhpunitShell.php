@@ -115,10 +115,10 @@ class PhpunitShell extends AppShell {
 		foreach ($versions as $key => $version) {
 			$default = '';
 			if ($c === 0) {
-				$default = "\t".'['.__('default').']';
+				$default = "\t" . '[' . __('default') . ']';
 			}
 			$c++;
-			$this->out($key.' : v'.$version.$default);
+			$this->out($key . ' : v' . $version . $default);
 		}
 	}
 
@@ -141,7 +141,7 @@ class PhpunitShell extends AppShell {
 		$packages = $this->_getDependencies($v);
 
 		foreach ($packages as $package) {
-			$this->out($package['name'].' ['.$package['folder'].']');
+			$this->out($package['name'] . ' [' . $package['folder'] . ']');
 		}
 	}
 
@@ -198,7 +198,7 @@ class PhpunitShell extends AppShell {
 			# Copy the contents to the target folder
 			$this->out(__('Adding to Vendors ..'), 0);
 
-			if (!$Folder->move(array('to'=>$tmpPath . '_target'.DS.$file['folder'].DS, 'from'=>$tmpPath.(str_replace('.tgz', '', $file['file'])).DS.$file['folder'].DS))) {
+			if (!$Folder->move(array('to' => $tmpPath . '_target' . DS . $file['folder'] . DS, 'from' => $tmpPath . (str_replace('.tgz', '', $file['file'])) . DS . $file['folder'] . DS))) {
 				$this->err($Folder->errors());
 			}
 			$this->out('Adding done.');
@@ -209,10 +209,10 @@ class PhpunitShell extends AppShell {
 		$this->out(__('Cleaning up install files.'));
 		$this->hr();
 
-		$Folder->move(array('to'=>$path, 'from'=>$tmpPath.'_target'.DS, 'merge'=>true));
+		$Folder->move(array('to' => $path, 'from' => $tmpPath . '_target' . DS, 'merge' => true));
 
 		# Clean up
-		$Folder->delete($path . '_TMP'.DS);
+		$Folder->delete($path . '_TMP' . DS);
 
 		$this->out();
 		$this->out(__('<info>PHPUnit %s</info> <warning>has been successfully installed to your Vendor folder!</warning>', $v));
@@ -249,7 +249,7 @@ class PhpunitShell extends AppShell {
 			$version = substr($version, 0, strrpos($version, '.'));
 
 			if (!isset($officialList[$identifier])) {
-				return $this->error(__('Missing package').': '.$identifier);
+				return $this->error(__('Missing package') . ': ' . $identifier);
 			}
 			$pearPackage = $officialList[$identifier];
 			unset($officialList[$identifier]);
@@ -263,23 +263,23 @@ class PhpunitShell extends AppShell {
 
 		$this->out('');
 		foreach ($result as $row) {
-			$this->out('# '.$row['name']. '');
+			$this->out('# ' . $row['name'] . '');
 			if ($row['current'] == $row['head']) {
-				$this->out("\t" . 'OK (v'.$row['current'].')');
+				$this->out("\t" . 'OK (v' . $row['current'] . ')');
 			} else {
 				$this->out("\t" . __('UPDATE to v%s available (currently v%s)', $row['head'], $row['current']));
 			}
 			if (!empty($this->params['verbose'])) {
-				$this->out($this->wrapText($row['description'], array('indent'=>"\t")));
+				$this->out($this->wrapText($row['description'], array('indent' => "\t")));
 			}
 		}
 
 		$this->hr();
 		$this->out(__('Unused pear packages') . ':');
 		foreach ($officialList as $key => $val) {
-			$this->out('# '.$key.' (v'.$val[1].')');
+			$this->out('# ' . $key . ' (v' . $val[1] . ')');
 			if (!empty($this->params['verbose'])) {
-				$this->out($this->wrapText($val[2], array('indent'=>"\t")));
+				$this->out($this->wrapText($val[2], array('indent' => "\t")));
 			}
 		}
 	}
@@ -369,7 +369,7 @@ class PhpunitShell extends AppShell {
 			array_shift($tmp);
 			foreach ($tmp as $key => $val) {
 				$tmp[$key] = trim($val);
-				$name = substr($tmp[0], strrpos($tmp[0], '/')+1);
+				$name = substr($tmp[0], strrpos($tmp[0], '/') + 1);
 			}
 			$res[$name] = $tmp;
 
@@ -404,7 +404,7 @@ class PhpunitShell extends AppShell {
 				continue;
 			}
 			$p = array(
-				0 => 'phpunit/'.$name,
+				0 => 'phpunit/' . $name,
 				1 => $version,
 				2 => $package['content'],
 				3 => $package['link']['@href'],
@@ -451,7 +451,7 @@ class PhpunitShell extends AppShell {
 
 		if (WINDOWS && empty($this->params['os']) || !empty($this->params['os']) && $this->params['os'] === 'w') {
 			$exePath = App::pluginPath('Phpunit') . 'Vendor' . DS . 'exe' . DS;
-			exec($exePath.'gzip -dr '.$file);
+			exec($exePath . 'gzip -dr ' . $file);
 			$tarFile = str_replace('.tgz', '.tar', $file);
 			exec($exePath . 'tar -xvf ' . $tarFile);
 		} else {
@@ -481,7 +481,7 @@ class PhpunitShell extends AppShell {
 			return $this->_stop();
 		}
 
-		$path = $paths[$res-1];
+		$path = $paths[$res - 1];
 		return $path;
 	}
 
