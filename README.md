@@ -1,7 +1,7 @@
 ## PHPUnit installer as CakePHP standalone plugin
 
 PHPUnit installer now supports
-3.7 (currently 3.7.19), 3.6 and 3.5
+3.7 (latest version per default), 3.6 and 3.5
 
 ## What?
 
@@ -24,9 +24,16 @@ Otherwise the plugin will not be available.
 
 ## Usage
 
-To install PHPUnit to your CakePHP 2.x install you can use the Shell.
+To check if the plugin works, type
 
-Run `cake Phpunit.Phpunit install` directly from your console.
+	cake Phpunit.Phpunit
+
+This should give you the current PHPUnit version you will be able to download and install.
+
+To install PHPUnit to your CakePHP 2.x app you can use the following command from your APP dir:
+
+	cake Phpunit.Phpunit install
+
 This will download and extract all the necessary files, and put them in your specified `Vendor` folder.
 
 You can now use PHPUnit through the CLI or your favourite browser. Try it by running:
@@ -35,15 +42,25 @@ You can now use PHPUnit through the CLI or your favourite browser. Try it by run
 
 If all went well you will see the PHPUnit run the CakePHP basic tests.
 
+To run the Tools plugin tests, for example, use:
+
+	cake testsuite Tools AllTools
+
 It works with Mac OSX, Linux and Windows. Please report any problems.
+
+You can also use the browser testsuite:
+
+	http://domain.local/test.php
 
 ## Autoload
 
 If you have it installed in your ROOT vendors and get (fatal) errors while baking put this at the top of the VENDORS/PHPUnit/Autoload.php file:
 
-    if (strpos(get_include_path(), dirname(dirname(__FILE__))) === false) {
-        set_include_path(get_include_path() . PATH_SEPARATOR . dirname(dirname(__FILE__)));
-    }
+```php
+if (strpos(get_include_path(), dirname(dirname(__FILE__))) === false) {
+	set_include_path(get_include_path() . PATH_SEPARATOR . dirname(dirname(__FILE__)));
+}
+```
 
 This way the vendors folder itself is also an include path and those errors will go away.
 The PHPUnit files are checked/included prior to baking unit tests. So if you did not already set the path in your system, you need to do it this way.
